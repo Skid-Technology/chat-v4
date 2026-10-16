@@ -1,0 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.utils;
+
+public class NoopLogger {
+    private final static boolean ENABLED = false;
+
+    public static void debug(String message) {
+    }
+
+    public static void info(String message) {
+    }
+
+    public static void error(Throwable error) {
+    }
+
+    public static void error(String message, Throwable error) {
+    }
+}
+

@@ -1,0 +1,276 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.jetbrains.annotations.Nullable
+ */
+package gg.vape.ui.click.component;
+
+import gg.vape.ui.click.GuiMouseEvent;
+import gg.vape.ui.click.MouseButton;
+import gg.vape.ui.click.MousePosition;
+import gg.vape.ui.click.component.GuiComponent;
+import gg.vape.ui.font.SmoothFontRenderer;
+import gg.vape.utils.render.GuiRenderPrimitives;
+import gg.vape.utils.render.ImageRenderer;
+import gg.vape.utils.render.RenderUtils;
+import java.awt.Color;
+import org.jetbrains.annotations.Nullable;
+
+public class MultilineTextBlockComponent
+extends GuiComponent {
+    private final String iconResource;
+    private double linkX;
+    private Color linkHoverColor;
+    private final static double ICON_TITLE_GAP = 3.0;
+    @Nullable
+    private String linkText;
+    private double componentWidth;
+    private final boolean useThemeAccent;
+    private final Color titleColor;
+    private final static double ACCENT_INSET = 2.0;
+    private double linkHeight;
+    private boolean linkHovered;
+    private final static double TITLE_FONT_SCALE = 0.75;
+    private final Color backgroundColor;
+    private double linkWidth;
+    private final static float CORNER_RADIUS = 2.5f;
+    private final static double CONTENT_TOP_INSET = 6.0;
+    private final static double CONTENT_PADDING = 8.0;
+    @Nullable
+    private Runnable linkAction;
+    private final static double ICON_SIZE = 7.0;
+    private final String title;
+    private final static double BODY_FONT_SCALE = 0.75;
+    private final Color bodyColor;
+    private final static float BORDER_THICKNESS = 1.0f;
+    private final static double ACCENT_CLIP_WIDTH = 2.0;
+    private final String bodyText;
+    private double linkY;
+    private final Color customAccentColor;
+    private Color linkColor;
+
+    @Override
+    public double C() {
+        SmoothFontRenderer bodyFontRenderer = this.getFontRenderer(0.75);
+        double bodyHeight = this.measureWrappedTextHeight(bodyFontRenderer, this.bodyText, this.A() - 2.0 - 16.0);
+        return 15.0 + bodyHeight + 6.0;
+    }
+
+    public void setLink(String linkText, Runnable linkAction) {
+        this.linkText = linkText;
+        this.linkAction = linkAction;
+    }
+
+    private double measureWrappedTextHeight(SmoothFontRenderer fontRenderer, String text, double maxWidth) {
+        String[] paragraphs;
+        if (maxWidth <= 0.0) {
+            maxWidth = this.componentWidth - 2.0 - 16.0;
+        }
+        double lineHeight = fontRenderer.d("A") + 1.0;
+        int lineCount = 0;
+        for (String paragraph : paragraphs = text.split("\n", -1)) {
+            if (paragraph.isEmpty()) {
+                ++lineCount;
+                continue;
+            }
+            String[] words = paragraph.split(" ");
+            StringBuilder currentLine = new StringBuilder();
+            int paragraphLineCount = 1;
+            for (String word : words) {
+                String candidateLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+                double candidateWidth = fontRenderer.N(candidateLine);
+                if (candidateWidth > maxWidth && currentLine.length() > 0) {
+                    ++paragraphLineCount;
+                    currentLine = new StringBuilder(word);
+                    continue;
+                }
+                currentLine = new StringBuilder(candidateLine);
+            }
+            lineCount += paragraphLineCount;
+        }
+        return (double)lineCount * lineHeight;
+    }
+
+    public void setWidth(double width) {
+        this.componentWidth = width;
+    }
+
+    @Override
+    public double x() {
+        return this.componentWidth;
+    }
+
+    @Override
+    public void I() {
+    }
+
+    public MultilineTextBlockComponent(String title, String bodyText) {
+        this.linkColor = MultilineTextBlockComponent.J.var_java_awt_Color_T;
+        this.linkHoverColor = MultilineTextBlockComponent.J.var_java_awt_Color_X;
+        this.componentWidth = 110.0;
+        this.title = title;
+        this.bodyText = bodyText;
+        this.iconResource = "info";
+        this.customAccentColor = null;
+        this.useThemeAccent = true;
+        this.backgroundColor = MultilineTextBlockComponent.J.var_java_awt_Color_m;
+        this.titleColor = MultilineTextBlockComponent.J.var_java_awt_Color_A;
+        this.bodyColor = MultilineTextBlockComponent.J.var_java_awt_Color_Z;
+    }
+
+    @Override
+    public void u() {
+    }
+
+    private Color resolveAccentColor() {
+        return this.useThemeAccent ? J.z() : this.customAccentColor;
+    }
+
+    @Override
+    public void H() {
+        double x = this.G$src$D$1b2f02a();
+        double y = this.n();
+        double width = this.A();
+        double height = this.L();
+        if (this.linkText != null && this.linkWidth > 0.0) {
+            MousePosition mousePosition = RenderUtils.h();
+            this.linkHovered = (double)mousePosition.var_int_O >= this.linkX && (double)mousePosition.var_int_O <= this.linkX + this.linkWidth && (double)mousePosition.var_int_H >= this.linkY && (double)mousePosition.var_int_H <= this.linkY + this.linkHeight;
+        } else {
+            this.linkHovered = false;
+        }
+        GuiRenderPrimitives.e(x, y, width, height, this.backgroundColor, false, 2.5f, 1.0f);
+        double contentX = x + 2.0 + 8.0;
+        double contentTop = y + 6.0;
+        double bodyMaxWidth = width - 2.0 - 16.0;
+        Color accentColor = this.resolveAccentColor();
+        double accentWidth = 7.0;
+        RenderUtils.m(x, y, 2.0, height);
+        GuiRenderPrimitives.p(x, y, accentWidth, height, accentColor, false, 2.5f, 1.0f, 8.0f, MultilineTextBlockComponent.J.var_java_awt_Color_u, 9);
+        RenderUtils.T();
+        double iconY = contentTop + 0.5;
+        ImageRenderer.drawImage(accentColor, (float)contentX, (float)iconY, this.iconResource, 7.0f, 7.0f, false);
+        double titleX = contentX + 7.0 + 3.0;
+        SmoothFontRenderer titleFontRenderer = this.getAlternateFontRenderer(0.75);
+        double titleHeight = titleFontRenderer.d("A");
+        double titleY = iconY + 3.5 - titleHeight / 2.0;
+        titleFontRenderer.d(this.title, titleX, titleY, this.titleColor);
+        double bodyY = contentTop + 7.0 + 2.0;
+        SmoothFontRenderer bodyFontRenderer = this.getFontRenderer(0.75);
+        this.renderWrappedBody(bodyFontRenderer, this.bodyText, contentX, bodyY, bodyMaxWidth, this.bodyColor);
+    }
+
+    @Override
+    public void g(GuiMouseEvent mouseEvent) {
+        if (this.linkText == null || this.linkAction == null || this.linkWidth <= 0.0) {
+            return;
+        }
+        if (mouseEvent.getAction() != MouseButton.LEFT_CLICK) {
+            return;
+        }
+        if ((double)mouseEvent.getX() >= this.linkX && (double)mouseEvent.getX() <= this.linkX + this.linkWidth && (double)mouseEvent.getY() >= this.linkY && (double)mouseEvent.getY() <= this.linkY + this.linkHeight) {
+            this.linkAction.run();
+            mouseEvent.setCancelled(true);
+        }
+    }
+
+    private void renderWrappedBody(SmoothFontRenderer fontRenderer, String text, double x, double y, double maxWidth, Color textColor) {
+        if (maxWidth <= 0.0) {
+            maxWidth = this.componentWidth - 2.0 - 16.0;
+        }
+        double lineHeight = fontRenderer.d("A") + 1.0;
+        double spaceWidth = fontRenderer.N(" ");
+        int linkStartIndex = this.linkText != null ? text.indexOf(this.linkText) : -1;
+        int linkEndIndex = linkStartIndex >= 0 ? linkStartIndex + this.linkText.length() : -1;
+        this.linkX = 0.0;
+        this.linkY = 0.0;
+        this.linkWidth = 0.0;
+        this.linkHeight = 0.0;
+        double currentX = x;
+        double currentY = y;
+        int textIndex = 0;
+        String[] paragraphs = text.split("\n", -1);
+        for (int paragraphIndex = 0; paragraphIndex < paragraphs.length; ++paragraphIndex) {
+            String[] words;
+            String paragraph = paragraphs[paragraphIndex];
+            if (paragraphIndex > 0) {
+                currentX = x;
+                currentY += lineHeight;
+            }
+            if (paragraph.isEmpty()) {
+                ++textIndex;
+                continue;
+            }
+            for (String word : words = paragraph.split(" ")) {
+                boolean linkWord;
+                double wordWidth = fontRenderer.N(word);
+                if (currentX + wordWidth > x + maxWidth && currentX > x) {
+                    currentX = x;
+                    currentY += lineHeight;
+                }
+                int wordEndIndex = textIndex + word.length();
+                boolean bl = linkWord = linkStartIndex >= 0 && textIndex < linkEndIndex && wordEndIndex > linkStartIndex;
+                if (linkWord) {
+                    Color renderedLinkColor = this.linkHovered ? this.linkHoverColor : this.linkColor;
+                    fontRenderer.d(word, currentX, currentY, renderedLinkColor);
+                    if (this.linkWidth == 0.0) {
+                        this.linkX = currentX;
+                        this.linkY = currentY;
+                        this.linkHeight = lineHeight;
+                    }
+                    this.linkWidth = currentX + wordWidth - this.linkX;
+                } else {
+                    fontRenderer.d(word, currentX, currentY, textColor);
+                }
+                currentX += wordWidth + spaceWidth;
+                textIndex = wordEndIndex + 1;
+            }
+            if (paragraphIndex >= paragraphs.length - 1) continue;
+            textIndex = textIndex - 1 + 1;
+        }
+        if (this.linkText != null && this.linkWidth > 0.0) {
+            double textHeight = fontRenderer.d("A");
+            double underlineY = this.linkY + textHeight;
+            Color underlineColor = this.linkHovered ? this.linkHoverColor : this.linkColor;
+            GuiRenderPrimitives.z(this.linkX, underlineY, this.linkX + this.linkWidth, underlineY, 1.0, 1.5, underlineColor);
+        }
+    }
+
+    @Override
+    public void F() {
+    }
+
+    public void setLinkColors(Color linkColor, Color linkHoverColor) {
+        this.linkColor = linkColor;
+        this.linkHoverColor = linkHoverColor;
+    }
+
+    public MultilineTextBlockComponent(String title, String bodyText, String iconResource, Color accentColor, Color backgroundColor, Color titleColor, Color bodyColor) {
+        this.linkColor = MultilineTextBlockComponent.J.var_java_awt_Color_T;
+        this.linkHoverColor = MultilineTextBlockComponent.J.var_java_awt_Color_X;
+        this.componentWidth = 110.0;
+        this.title = title;
+        this.bodyText = bodyText;
+        this.iconResource = iconResource;
+        this.customAccentColor = accentColor;
+        this.useThemeAccent = false;
+        this.backgroundColor = backgroundColor;
+        this.titleColor = titleColor;
+        this.bodyColor = bodyColor;
+    }
+
+    public MultilineTextBlockComponent(String title, String bodyText, Color accentColor) {
+        this.linkColor = MultilineTextBlockComponent.J.var_java_awt_Color_T;
+        this.linkHoverColor = MultilineTextBlockComponent.J.var_java_awt_Color_X;
+        this.componentWidth = 110.0;
+        this.title = title;
+        this.bodyText = bodyText;
+        this.iconResource = "info";
+        this.customAccentColor = accentColor;
+        this.useThemeAccent = false;
+        this.backgroundColor = MultilineTextBlockComponent.J.var_java_awt_Color_m;
+        this.titleColor = MultilineTextBlockComponent.J.var_java_awt_Color_A;
+        this.bodyColor = MultilineTextBlockComponent.J.var_java_awt_Color_Z;
+    }
+}
+

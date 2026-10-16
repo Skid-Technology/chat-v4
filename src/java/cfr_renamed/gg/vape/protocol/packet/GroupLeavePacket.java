@@ -1,0 +1,36 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.protocol.packet;
+
+import gg.vape.protocol.ZeusPacketBuffer;
+import gg.vape.protocol.packet.GroupLeaveResponsePacket;
+import gg.vape.protocol.packet.ZeusTrackedPacket;
+
+public class GroupLeavePacket
+extends ZeusTrackedPacket<GroupLeaveResponsePacket> {
+    private static int[] var_int_arr_z;
+
+    @Override
+    public void x(ZeusPacketBuffer gx_12) {
+    }
+
+    public static void b(int[] nArray) {
+        var_int_arr_z = nArray;
+    }
+
+    @Override
+    public void T(ZeusPacketBuffer gx_12) {
+    }
+
+    public static int[] l() {
+        return var_int_arr_z;
+    }
+
+    static {
+        if (GroupLeavePacket.l() != null) {
+            GroupLeavePacket.b(new int[4]);
+        }
+    }
+}
+

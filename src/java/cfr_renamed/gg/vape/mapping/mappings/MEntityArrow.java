@@ -1,0 +1,143 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.mapping.mappings;
+
+import gg.vape.mapping.MappedClasses;
+import gg.vape.mapping.Mapping;
+import gg.vape.mapping.MappingField;
+import gg.vape.mapping.mappings.MSPacketMapChunkBulk;
+import gg.vape.wrapper.Wrapper;
+import gg.vape.wrapper.impl.ForgeVersion;
+
+public class MEntityArrow
+extends Mapping {
+    private MappingField var_gg_vape_mapping_MappingField_p;
+    private MappingField var_gg_vape_mapping_MappingField_T;
+    private MappingField var_gg_vape_mapping_MappingField_l;
+    private MappingField var_gg_vape_mapping_MappingField_c;
+
+    public MEntityArrow() {
+        this(MSPacketMapChunkBulk.getMappingControlFlowToken());
+    }
+
+    private MEntityArrow(String string) {
+        super(MappedClasses.qZ);
+        boolean bl;
+        Class<Double> clazz;
+        if (string != null) {
+            if (ForgeVersion.MC_1_21_0.d()) {
+                Class<Double> clazz2 = Double.TYPE;
+                boolean bl2 = true;
+                String string2 = "accelerationPower";
+                Class clazz22 = MappedClasses.ze;
+                MEntityArrow mEntityArrow = this;
+                this.var_gg_vape_mapping_MappingField_l = mEntityArrow.registerInstanceFieldForOwner(clazz22, string2, bl2, clazz2);
+            } else if (ForgeVersion.MC_1_16_5.d()) {
+                Class<Double> clazz3 = Double.TYPE;
+                boolean bl3 = Wrapper.isNativeAvailable;
+                String string3 = "field_70232_b";
+                Class clazz32 = MappedClasses.ze;
+                MEntityArrow mEntityArrow = this;
+                this.var_gg_vape_mapping_MappingField_c = mEntityArrow.registerInstanceFieldForOwner(clazz32, string3, bl3, clazz3);
+                Class<Double> clazz4 = Double.TYPE;
+                boolean bl2 = Wrapper.isNativeAvailable;
+                String string4 = "field_70233_c";
+                Class clazz5 = MappedClasses.ze;
+                MEntityArrow mEntityArrow2 = this;
+                this.var_gg_vape_mapping_MappingField_T = this.registerInstanceFieldForOwner(clazz5, string4, bl2, clazz4);
+                Class<Double> clazz6 = Double.TYPE;
+                boolean bl32 = Wrapper.isNativeAvailable;
+                String string5 = "field_70230_d";
+                Class clazz7 = MappedClasses.ze;
+                MEntityArrow mEntityArrow3 = this;
+                this.var_gg_vape_mapping_MappingField_p = this.registerInstanceFieldForOwner(clazz7, string5, bl32, clazz6);
+            } else {
+                Class<Double> clazz4 = Double.TYPE;
+                boolean bl4 = true;
+                String string6 = "accelerationX";
+                MEntityArrow mEntityArrow = this;
+                this.var_gg_vape_mapping_MappingField_c = mEntityArrow.J(string6, bl4, clazz4);
+                Class<Double> clazz8 = Double.TYPE;
+                boolean bl42 = true;
+                String string7 = "accelerationY";
+                MEntityArrow mEntityArrow4 = this;
+                this.var_gg_vape_mapping_MappingField_T = this.J(string7, bl42, clazz8);
+                Class<Double> clazz9 = Double.TYPE;
+                boolean bl5 = true;
+                String string8 = "accelerationZ";
+                MEntityArrow mEntityArrow5 = this;
+                this.var_gg_vape_mapping_MappingField_p = this.J(string8, bl5, clazz9);
+            }
+            return;
+        }
+        if (ForgeVersion.MC_1_21_0.d()) {
+            clazz = Double.TYPE;
+            bl = Wrapper.isNativeAvailable;
+            String string9 = "field_70232_b";
+            Class clazz10 = MappedClasses.ze;
+            MEntityArrow mEntityArrow = this;
+            this.var_gg_vape_mapping_MappingField_c = mEntityArrow.registerInstanceFieldForOwner(clazz10, string9, bl, clazz);
+            Class<Double> clazz11 = Double.TYPE;
+            boolean bl6 = Wrapper.isNativeAvailable;
+            String string10 = "field_70233_c";
+            Class clazz12 = MappedClasses.ze;
+            MEntityArrow mEntityArrow6 = this;
+            this.var_gg_vape_mapping_MappingField_T = this.registerInstanceFieldForOwner(clazz12, string10, bl6, clazz11);
+            Class<Double> clazz13 = Double.TYPE;
+            boolean bl7 = Wrapper.isNativeAvailable;
+            String string11 = "field_70230_d";
+            Class clazz14 = MappedClasses.ze;
+            MEntityArrow mEntityArrow7 = this;
+            this.var_gg_vape_mapping_MappingField_p = this.registerInstanceFieldForOwner(clazz14, string11, bl7, clazz13);
+        }
+        clazz = Double.TYPE;
+        bl = true;
+        String string12 = "accelerationX";
+        MEntityArrow mEntityArrow = this;
+        this.var_gg_vape_mapping_MappingField_c = mEntityArrow.J(string12, bl, clazz);
+        Class<Double> clazz15 = Double.TYPE;
+        boolean bl8 = true;
+        String string13 = "accelerationY";
+        MEntityArrow mEntityArrow8 = this;
+        this.var_gg_vape_mapping_MappingField_T = this.J(string13, bl8, clazz15);
+        Class<Double> clazz16 = Double.TYPE;
+        boolean bl9 = true;
+        String string14 = "accelerationZ";
+        MEntityArrow mEntityArrow9 = this;
+        this.var_gg_vape_mapping_MappingField_p = this.J(string14, bl9, clazz16);
+    }
+
+    private double t(Object object) {
+        return this.var_gg_vape_mapping_MappingField_l.getDouble(object);
+    }
+
+    public static double d(MEntityArrow mEntityArrow, Object object) {
+        return mEntityArrow.F(object);
+    }
+
+    public static double D(MEntityArrow mEntityArrow, Object object) {
+        return mEntityArrow.h(object);
+    }
+
+    private double U(Object object) {
+        return this.var_gg_vape_mapping_MappingField_p.getDouble(object);
+    }
+
+    private double F(Object object) {
+        return this.var_gg_vape_mapping_MappingField_c.getDouble(object);
+    }
+
+    public static double t(MEntityArrow mEntityArrow, Object object) {
+        return mEntityArrow.t(object);
+    }
+
+    public static double g(MEntityArrow mEntityArrow, Object object) {
+        return mEntityArrow.U(object);
+    }
+
+    private double h(Object object) {
+        return this.var_gg_vape_mapping_MappingField_T.getDouble(object);
+    }
+}
+

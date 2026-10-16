@@ -1,0 +1,4 @@
+Premain-Class: Agent
+Agent-Class: Agent
+Can-Retransform-Classes: true
+Can-Redefine-Classes: true

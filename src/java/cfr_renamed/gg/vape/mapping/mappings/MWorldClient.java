@@ -1,0 +1,122 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.mapping.mappings;
+
+import gg.vape.mapping.MappedClasses;
+import gg.vape.mapping.Mapping;
+import gg.vape.mapping.MappingField;
+import gg.vape.mapping.MappingMethod;
+import gg.vape.mapping.MappingMethodBuilder;
+import gg.vape.mapping.mappings.MPlayerControllerMP;
+import gg.vape.ui.click.component.GuiComponent;
+import gg.vape.wrapper.impl.Entity;
+import gg.vape.wrapper.impl.ForgeVersion;
+
+public class MWorldClient
+extends Mapping {
+    private final MappingMethod var_gg_vape_mapping_MappingMethod_u;
+    private MappingField var_gg_vape_mapping_MappingField_D;
+    private MappingField var_gg_vape_mapping_MappingField_x;
+    private final MappingMethod var_gg_vape_mapping_MappingMethod_s;
+
+    public MWorldClient() {
+        this(MPlayerControllerMP.d());
+    }
+
+    private MWorldClient(int n) {
+        super(MappedClasses.var_java_lang_Class_Z);
+        String string;
+        int n2 = n;
+        if (n2 != 0) {
+            MWorldClient mWorldClient;
+            String string2;
+            boolean bl;
+            Class<Void> clazz;
+            Class[] classArray;
+            if (ForgeVersion.MC_1_8_9.L()) {
+                classArray = new Class[]{Integer.TYPE, MappedClasses.zc};
+                clazz = Void.TYPE;
+                bl = true;
+                string2 = "addEntityImpl";
+                mWorldClient = this;
+                mWorldClient.Y(string2, bl, clazz, classArray);
+                Class clazz2 = MappedClasses.CLIENT_WORLD_INFO;
+                boolean bl2 = true;
+                String string22 = "clientLevelData";
+                Class clazz3 = MappedClasses.var_java_lang_Class_Z;
+                MWorldClient mWorldClient2 = this;
+                this.var_gg_vape_mapping_MappingField_D = this.registerInstanceFieldForOwner(clazz3, string22, bl2, clazz2);
+            }
+            classArray = new Class[]{Integer.TYPE, MappedClasses.zc};
+            clazz = Void.TYPE;
+            bl = true;
+            string2 = "addEntityToWorld";
+            mWorldClient = this;
+            this.var_gg_vape_mapping_MappingMethod_s = mWorldClient.Y(string2, bl, clazz, classArray);
+            this.var_gg_vape_mapping_MappingMethod_u = null;
+            if (GuiComponent.getLegacyComponentState() == null) {
+                MPlayerControllerMP.p(++n2);
+            }
+            return;
+        }
+        if (ForgeVersion.MC_1_8_9.L()) {
+            Class clazz = MappedClasses.le;
+            boolean bl = true;
+            string = "clientChunkProvider";
+            Class clazz4 = MappedClasses.var_java_lang_Class_Z;
+            MWorldClient mWorldClient = this;
+            this.var_gg_vape_mapping_MappingField_x = mWorldClient.registerInstanceFieldForOwner(clazz4, string, bl, clazz);
+        }
+        Class[] classArray = new Class[]{Integer.TYPE};
+        Class clazz = MappedClasses.zc;
+        string = "getEntityByID";
+        MWorldClient mWorldClient = this;
+        this.var_gg_vape_mapping_MappingMethod_u = ((MappingMethodBuilder)((MappingMethodBuilder)mWorldClient.methodBuilder(string, clazz, classArray).setNameForVersion(ForgeVersion.MC_1_16_5.n(), "getEntity")).setOwnerClassForVersion(ForgeVersion.MC_1_21_4.n(), MappedClasses.YU)).buildMethod();
+        if (ForgeVersion.MC_1_16_5.d()) {
+            Class[] classArray2 = new Class[]{Integer.TYPE, MappedClasses.zc};
+            Class<Void> clazz5 = Void.TYPE;
+            boolean bl = true;
+            String string3 = "addEntityImpl";
+            MWorldClient mWorldClient3 = this;
+            this.var_gg_vape_mapping_MappingMethod_s = this.Y(string3, bl, clazz5, classArray2);
+            Class clazz6 = MappedClasses.CLIENT_WORLD_INFO;
+            boolean bl3 = true;
+            String string4 = "clientLevelData";
+            Class clazz7 = MappedClasses.var_java_lang_Class_Z;
+            MWorldClient mWorldClient4 = this;
+            this.var_gg_vape_mapping_MappingField_D = this.registerInstanceFieldForOwner(clazz7, string4, bl3, clazz6);
+        } else {
+            Class[] classArray3 = new Class[]{Integer.TYPE, MappedClasses.zc};
+            Class<Void> clazz8 = Void.TYPE;
+            boolean bl = true;
+            String string5 = "addEntityToWorld";
+            MWorldClient mWorldClient5 = this;
+            this.var_gg_vape_mapping_MappingMethod_s = this.Y(string5, bl, clazz8, classArray3);
+        }
+        if (GuiComponent.getLegacyComponentState() == null) {
+            MPlayerControllerMP.p(++n2);
+        }
+    }
+
+    public void Z(Object object, int n, Entity entity) {
+        if (ForgeVersion.MC_1_20_6.d()) {
+            this.var_gg_vape_mapping_MappingMethod_s.invokeVoid(object, entity.getObject());
+            return;
+        }
+        this.var_gg_vape_mapping_MappingMethod_s.invokeVoid(object, n, entity.getObject());
+    }
+
+    public Object t(Object object, int n) {
+        return this.var_gg_vape_mapping_MappingMethod_u.invokeObject(object, n);
+    }
+
+    public Object u(Object object) {
+        return this.var_gg_vape_mapping_MappingField_D.getObject(object);
+    }
+
+    public Object y(Object object) {
+        return this.var_gg_vape_mapping_MappingField_x.getObject(object);
+    }
+}
+

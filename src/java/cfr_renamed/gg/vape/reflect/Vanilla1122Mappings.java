@@ -1,0 +1,49 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.reflect;
+
+import gg.vape.reflect.NamedLegacyRuntimeDetector;
+import gg.vape.reflect.VanillaSrgMappings;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+public final class Vanilla1122Mappings {
+    private final static VanillaSrgMappings MAPPINGS = new VanillaSrgMappings("Minecraft 1.12.2", "/mappings/vanilla1122/joined.srg", "bib", "z", "R", "bud", "amu");
+
+    private Vanilla1122Mappings() {
+    }
+
+    public static String remapClassName(String sourceClassName) {
+        return MAPPINGS.remapClassName(sourceClassName);
+    }
+
+    public static Class<?> resolveClass(String sourceClassName, ClassLoader ... preferredLoaders) {
+        return MAPPINGS.resolveClass(sourceClassName, preferredLoaders);
+    }
+
+    public static boolean isRuntimePresent(ClassLoader ... preferredLoaders) {
+        return MAPPINGS.isRuntimePresent(preferredLoaders) || NamedLegacyRuntimeDetector.is1122Runtime(MAPPINGS, preferredLoaders);
+    }
+
+    static String lookupFieldSrgName(Field field) {
+        return MAPPINGS.lookupFieldSrgName(field);
+    }
+
+    static String lookupMethodSrgName(Method method) {
+        return MAPPINGS.lookupMethodSrgName(method);
+    }
+
+    public static int getClassMappingCount() {
+        return MAPPINGS.getClassMappingCount();
+    }
+
+    public static int getFieldMappingCount() {
+        return MAPPINGS.getFieldMappingCount();
+    }
+
+    public static int getMethodMappingCount() {
+        return MAPPINGS.getMethodMappingCount();
+    }
+}
+

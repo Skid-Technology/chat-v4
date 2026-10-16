@@ -1,0 +1,91 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.mapping.mappings;
+
+import gg.vape.mapping.MappedClasses;
+import gg.vape.mapping.Mapping;
+import gg.vape.mapping.MappingField;
+import gg.vape.mapping.MappingMethod;
+import gg.vape.mapping.mappings.MPotion;
+import gg.vape.wrapper.impl.ForgeVersion;
+
+public class MStatusEffect
+extends Mapping {
+    private MappingMethod var_gg_vape_mapping_MappingMethod_N;
+    private MappingField var_gg_vape_mapping_MappingField_B;
+    private MappingMethod var_gg_vape_mapping_MappingMethod_M;
+    private MappingMethod var_gg_vape_mapping_MappingMethod_O;
+    private MappingMethod var_gg_vape_mapping_MappingMethod_u;
+
+    private int S(Object object) {
+        return this.var_gg_vape_mapping_MappingMethod_O.invokeInt(null, object);
+    }
+
+    private Object T(Object object) {
+        return this.var_gg_vape_mapping_MappingMethod_N.invokeObject(object, new Object[0]);
+    }
+
+    public static Object g(MStatusEffect mStatusEffect, Object object) {
+        return mStatusEffect.T(object);
+    }
+
+    private boolean q(Object object) {
+        return this.var_gg_vape_mapping_MappingMethod_u.invokeBoolean(object, new Object[0]);
+    }
+
+    public Object O(int n) {
+        return this.var_gg_vape_mapping_MappingMethod_M.invokeObject(null, n);
+    }
+
+    public static boolean r(MStatusEffect mStatusEffect, Object object) {
+        return mStatusEffect.q(object);
+    }
+
+    public MStatusEffect() {
+        this(MPotion.K());
+    }
+
+    private MStatusEffect(int[] nArray) {
+        super(MappedClasses.D3);
+        MStatusEffect mStatusEffect;
+        String string;
+        boolean bl;
+        Class clazz;
+        Class[] classArray;
+        if (nArray != null) {
+            return;
+        }
+        if (ForgeVersion.MC_1_20_6.v()) {
+            classArray = new Class[]{Integer.TYPE};
+            clazz = MappedClasses.D3;
+            bl = true;
+            string = "get";
+            mStatusEffect = this;
+            this.var_gg_vape_mapping_MappingMethod_M = mStatusEffect.registerStaticMethod(string, bl, clazz, classArray);
+            Class[] classArray2 = new Class[]{MappedClasses.D3};
+            Class<Integer> clazz2 = Integer.TYPE;
+            boolean bl2 = true;
+            String string2 = "getId";
+            MStatusEffect mStatusEffect2 = this;
+            this.var_gg_vape_mapping_MappingMethod_O = this.registerStaticMethod(string2, bl2, clazz2, classArray2);
+        }
+        classArray = new Class[]{};
+        clazz = Boolean.TYPE;
+        bl = true;
+        string = "isBeneficial";
+        mStatusEffect = this;
+        this.var_gg_vape_mapping_MappingMethod_u = mStatusEffect.Y(string, bl, clazz, classArray);
+        Class[] classArray3 = new Class[]{};
+        Class clazz3 = MappedClasses.Yr;
+        boolean bl3 = true;
+        String string3 = "getDisplayName";
+        MStatusEffect mStatusEffect3 = this;
+        this.var_gg_vape_mapping_MappingMethod_N = this.Y(string3, bl3, clazz3, classArray3);
+    }
+
+    public static int a(MStatusEffect mStatusEffect, Object object) {
+        return mStatusEffect.S(object);
+    }
+}
+

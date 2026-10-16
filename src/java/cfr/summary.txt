@@ -1,0 +1,139 @@
+Summary for payload_jar/vape_client_deobf_full.jar
+Decompiled with CFR 0.152
+
+
+gg.vape.ui.click.frame.impl.profile.ProfileListEntryComponent
+----------------------------
+
+renderNormalMode(gg.vape.ui.font.SmoothFontRenderer double double boolean boolean java.awt.Color java.awt.Color )
+  Unable to fully structure code
+
+
+gg.vape.utils.render.RemoteImageTextureLoader
+----------------------------
+
+download(java.lang.String )
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [2[TRYBLOCK]], but top level block is 26[DOLOOP]
+
+
+gg.vape.shaded.javassist.bytecode.CodeIterator
+----------------------------
+
+insertGap2w(byte[] int int boolean java.util.List<gg.vape.shaded.javassist.bytecode.CodeIterator$Branch> gg.vape.shaded.javassist.bytecode.CodeIterator$Pointers )
+  Unable to fully structure code
+
+
+gg.vape.shaded.org.objectweb.asm.signature.SignatureReader
+----------------------------
+
+parseType(java.lang.String int gg.vape.shaded.org.objectweb.asm.signature.SignatureVisitor )
+  Unable to fully structure code
+
+
+com.google.common.util.concurrent.Futures
+----------------------------
+
+setOneValue(int java.util.concurrent.Future<? extends V> )
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Started 2 blocks at once
+run()
+  Loose catch block
+
+
+com.google.common.util.concurrent.Monitor
+----------------------------
+
+enterWhenUninterruptibly(com.google.common.util.concurrent.Monitor$Guard long java.util.concurrent.TimeUnit )
+  Loose catch block
+
+
+com.google.gson.internal.$Gson$Types
+----------------------------
+
+resolve(java.lang.reflect.Type java.lang.Class<?> java.lang.reflect.Type java.util.Map<java.lang.reflect.TypeVariable<?>, java.lang.reflect.Type> )
+  Unable to fully structure code
+
+
+io.netty.handler.codec.MessageToMessageEncoder
+----------------------------
+
+write(io.netty.channel.ChannelHandlerContext java.lang.Object io.netty.channel.ChannelPromise )
+  Loose catch block
+
+
+io.netty.handler.codec.compression.SnappyFramedDecoder
+----------------------------
+
+decode(io.netty.channel.ChannelHandlerContext io.netty.buffer.ByteBuf java.util.List<java.lang.Object> )
+  Unable to fully structure code
+
+
+io.netty.handler.codec.ByteToMessageDecoder
+----------------------------
+
+channelRead(io.netty.channel.ChannelHandlerContext java.lang.Object )
+  Loose catch block
+
+
+io.netty.util.concurrent.SingleThreadEventExecutor
+----------------------------
+
+run()
+  Loose catch block
+
+
+io.netty.util.concurrent.DefaultPromise
+----------------------------
+
+await0(long boolean )
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [0[TRYBLOCK]], but top level block is 10[MONITOR]
+
+
+io.netty.util.NetUtil
+----------------------------
+
+<clinit>()
+  Unable to fully structure code
+
+
+io.netty.util.internal.ThreadLocalRandom
+----------------------------
+
+getInitialSeedUniquifier()
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [2[DOLOOP]], but top level block is 0[TRYBLOCK]
+
+
+io.netty.util.internal.chmv8.ForkJoinWorkerThread
+----------------------------
+
+run()
+  Loose catch block
+
+
+io.netty.util.internal.chmv8.ForkJoinPool
+----------------------------
+
+tryHelpStealer(io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue io.netty.util.internal.chmv8.ForkJoinTask<?> )
+  Unable to fully structure code
+tryTerminate(boolean boolean )
+  Unable to fully structure code
+
+
+org.apache.commons.io.filefilter.MagicNumberFileFilter
+----------------------------
+
+accept(java.io.File )
+  Loose catch block
+
+
+org.lwjgl.opengl.LinuxCanvasImplementation
+----------------------------
+
+findVisualIDFromFormat(int org.lwjgl.opengl.PixelFormat )
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Started 2 blocks at once
+
+
+org.lwjgl.opengl.LinuxDisplay
+----------------------------
+
+getGammaRampLength()
+  Loose catch block

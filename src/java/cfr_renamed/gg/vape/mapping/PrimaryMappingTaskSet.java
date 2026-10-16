@@ -1,0 +1,235 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.mapping;
+
+import gg.vape.Vape;
+import gg.vape.asm.transform.impl.GuiScreenOpenTransformer;
+import gg.vape.asm.transform.impl.MinecraftMouseActionTransformer;
+import gg.vape.asm.transform.impl.PlayerControllerMPTransformer;
+import gg.vape.event.impl.EventChatMessageRender;
+import gg.vape.event.impl.EventFogDensity;
+import gg.vape.event.impl.EventPreRenderLivingSpecials;
+import gg.vape.event.impl.EventRender2D;
+import gg.vape.mapping.Badlion189InputQueueMappingTask;
+import gg.vape.mapping.Badlion189Render2DMappingTask;
+import gg.vape.mapping.BlockLayerOverrideEventMappingTask;
+import gg.vape.mapping.BlockLayerOverrideModernEventMappingTask;
+import gg.vape.mapping.BlockModelRenderEventMappingTask;
+import gg.vape.mapping.BlockRenderColorOpacityMappingTask;
+import gg.vape.mapping.BlockRenderLayerEventMappingTask;
+import gg.vape.mapping.ChatMessageRenderMappingTask;
+import gg.vape.mapping.ChunkRenderRebuildEventMappingTask;
+import gg.vape.mapping.EntityClientPlayerMPMotionMappingTask;
+import gg.vape.mapping.EntityLivingBaseEventMappingTask;
+import gg.vape.mapping.EntityMoveEventMappingTask;
+import gg.vape.mapping.EntityPlayerSPEventMappingTask;
+import gg.vape.mapping.EntityRenderPreEventMappingTask;
+import gg.vape.mapping.EntityRenderStateMappingTask;
+import gg.vape.mapping.EntityRendererEventMappingTask;
+import gg.vape.mapping.EventPostTickCallback;
+import gg.vape.mapping.EventPreRenderEntityCallback;
+import gg.vape.mapping.EventPreTickCallback;
+import gg.vape.mapping.EventRenderPlayerPostCallback;
+import gg.vape.mapping.EventRenderPlayerPreCallback;
+import gg.vape.mapping.FogDensityEventMappingTask;
+import gg.vape.mapping.GlStateManagerBlendFuncMappingTask;
+import gg.vape.mapping.InsertedCallbackLockMarker;
+import gg.vape.mapping.ItemRendererFirstPersonEventMappingTask;
+import gg.vape.mapping.ItemStackTooltipMappingTask;
+import gg.vape.mapping.JavassistMappingTask;
+import gg.vape.mapping.KeyBindingStateEventMappingTask;
+import gg.vape.mapping.LegacyEntityRenderPreEventMappingTask;
+import gg.vape.mapping.LegacyRenderStringHookMappingTask;
+import gg.vape.mapping.LegacyWorldEntityJoinEventMappingTask;
+import gg.vape.mapping.LivingSpecialsRenderMappingTask;
+import gg.vape.mapping.LocalPlayerTickClassTransformer;
+import gg.vape.mapping.MappedClasses;
+import gg.vape.mapping.MappingTaskSet;
+import gg.vape.mapping.MinecraftTickEventMappingTask;
+import gg.vape.mapping.NetworkPacketEventMappingTask;
+import gg.vape.mapping.PlayerControllerMPEventMappingTask;
+import gg.vape.mapping.PlayerTabOverlayDisplayNameLegacyMappingTask;
+import gg.vape.mapping.PlayerTabOverlayDisplayNameMappingTask;
+import gg.vape.mapping.PlayerTickEventMappingTask;
+import gg.vape.mapping.Render2DStaticCallbackMappingTask;
+import gg.vape.mapping.Render3DEventMappingTask;
+import gg.vape.mapping.RenderBatchFlushCallbackMarker;
+import gg.vape.mapping.RenderBlocksEventMappingTask;
+import gg.vape.mapping.RenderHandEventMappingTask;
+import gg.vape.mapping.RenderLivingBaseEventMappingTask;
+import gg.vape.mapping.RenderManagerEntityMappingTask;
+import gg.vape.mapping.RenderPlayerEventMappingTask;
+import gg.vape.mapping.RenderTickEventMappingTask;
+import gg.vape.mapping.RenderWorldPassEventMappingTask;
+import gg.vape.mapping.RenderWorldPassExecutorDrainMappingTask;
+import gg.vape.mapping.ScoreboardObjectiveRenderMappingTask;
+import gg.vape.mapping.ScoreboardScoresEventMappingTask;
+import gg.vape.mapping.ThreadBoundTickEventMappingTask;
+import gg.vape.mapping.VisGraphXRayVisibilityMappingTask;
+import gg.vape.mapping.WorldEntityJoinEventMappingTask;
+import gg.vape.mapping.WorldTimeEventMappingTask;
+import gg.vape.runtime.NativeBridge;
+import gg.vape.wrapper.impl.ForgeVersion;
+
+public class PrimaryMappingTaskSet
+extends MappingTaskSet {
+    private static boolean var_boolean_E;
+    private boolean var_boolean_S;
+    private boolean var_boolean_i;
+
+    public static void B(boolean bl) {
+        var_boolean_E = bl;
+    }
+
+    public PrimaryMappingTaskSet() {
+        JavassistMappingTask.p(EventPreTickCallback.class);
+        JavassistMappingTask.p(EventPostTickCallback.class);
+        JavassistMappingTask.p(EventRenderPlayerPreCallback.class);
+        JavassistMappingTask.p(EventRenderPlayerPostCallback.class);
+        JavassistMappingTask.p(EventPreRenderEntityCallback.class);
+        JavassistMappingTask.p(EventRender2D.class);
+        JavassistMappingTask.p(EventFogDensity.class);
+        JavassistMappingTask.p(RenderBatchFlushCallbackMarker.class);
+        JavassistMappingTask.p(InsertedCallbackLockMarker.class);
+        if (ForgeVersion.MC_1_20_6.d()) {
+            JavassistMappingTask.p(EventChatMessageRender.class);
+        }
+        if (ForgeVersion.c() == ForgeVersion.MC_1_21_11.i()) {
+            JavassistMappingTask.p(EventPreRenderLivingSpecials.class);
+        }
+    }
+
+    public void X() {
+        this.D.add(new MinecraftMouseActionTransformer());
+        if (ForgeVersion.MC_26_2.d()) {
+            this.D.add(new GuiScreenOpenTransformer());
+        }
+        this.D.add(new MinecraftTickEventMappingTask());
+        this.D.add(new EntityRendererEventMappingTask());
+        if (ForgeVersion.MC_1_21_4.d()) {
+            this.D.add(new RenderTickEventMappingTask());
+        }
+        this.D.add(new PlayerTickEventMappingTask());
+        this.D.add(new EntityLivingBaseEventMappingTask());
+        this.D.add(new LegacyWorldEntityJoinEventMappingTask());
+        this.D.add(new EntityPlayerSPEventMappingTask());
+        this.D.add(new LocalPlayerTickClassTransformer());
+        this.D.add(new RenderPlayerEventMappingTask());
+        this.D.add(new EntityRenderStateMappingTask());
+        this.D.add(new PlayerControllerMPEventMappingTask());
+        this.D.add(new PlayerControllerMPTransformer());
+        this.D.add(new ScoreboardScoresEventMappingTask());
+        if (ForgeVersion.MC_1_21_4.v()) {
+            this.D.add(new RenderManagerEntityMappingTask());
+        }
+        if (ForgeVersion.MC_1_7_10.L() && !Vape.INSTANCE.isForgeAbsent()) {
+            this.D.add(new LegacyEntityRenderPreEventMappingTask());
+        }
+        if (ForgeVersion.MC_1_12_2.B()) {
+            this.D.add(new RenderLivingBaseEventMappingTask());
+        }
+        if (ForgeVersion.MC_1_16_5.d()) {
+            this.D.add(new RenderHandEventMappingTask());
+            this.D.add(new WorldEntityJoinEventMappingTask());
+            this.D.add(new Render3DEventMappingTask());
+            if (ForgeVersion.MC_1_21_4.v()) {
+                this.D.add(new FogDensityEventMappingTask());
+            }
+        } else {
+            this.D.add(new LegacyRenderStringHookMappingTask());
+        }
+        this.D.add(new NetworkPacketEventMappingTask());
+        if (ForgeVersion.MC_1_7_10.L()) {
+            this.D.add(new EntityClientPlayerMPMotionMappingTask(MappedClasses.DI));
+        }
+        if (ForgeVersion.MC_1_8_9.L()) {
+            this.D.add(new ItemRendererFirstPersonEventMappingTask());
+            this.D.add(new WorldTimeEventMappingTask());
+        }
+        if (ForgeVersion.MC_1_16_5.d()) {
+            this.D.add(new PlayerTabOverlayDisplayNameMappingTask());
+        } else if (ForgeVersion.MC_1_8_9.d()) {
+            this.D.add(new PlayerTabOverlayDisplayNameLegacyMappingTask());
+        }
+        this.D.add(new ItemStackTooltipMappingTask());
+        if (ForgeVersion.MC_1_21_0.d()) {
+            this.D.add(new EntityRenderPreEventMappingTask());
+        }
+        if (ForgeVersion.MC_1_20_6.d()) {
+            this.D.add(new Render2DStaticCallbackMappingTask());
+        } else {
+            this.D.add(new ScoreboardObjectiveRenderMappingTask());
+        }
+        if (ForgeVersion.MC_1_21_4.d()) {
+            this.D.add(new RenderWorldPassEventMappingTask());
+        }
+        if (ForgeVersion.MC_1_21_6.d()) {
+            this.D.add(new GlStateManagerBlendFuncMappingTask());
+        }
+        this.D.add(new ThreadBoundTickEventMappingTask());
+        if (ForgeVersion.MC_1_20_6.d()) {
+            this.D.add(new ChatMessageRenderMappingTask());
+        }
+        if (ForgeVersion.MC_1_21_11.L() || ForgeVersion.MC_1_8_9.L()) {
+            this.D.add(new LivingSpecialsRenderMappingTask());
+        }
+        if (ForgeVersion.MC_1_21_11.d()) {
+            this.D.add(new KeyBindingStateEventMappingTask());
+        }
+        if (NativeBridge.isBadlion189Runtime()) {
+            this.D.add(new Badlion189InputQueueMappingTask());
+            this.D.add(new Badlion189Render2DMappingTask());
+        }
+    }
+
+    public static boolean K() {
+        boolean bl = PrimaryMappingTaskSet.Y$src$Z$1vg5zod();
+        return !bl;
+    }
+
+    public static boolean Y$src$Z$1vg5zod() {
+        return var_boolean_E;
+    }
+
+    public void f() {
+        if (this.var_boolean_i) {
+            return;
+        }
+        this.D.add(new EntityMoveEventMappingTask());
+        this.d();
+        this.var_boolean_i = true;
+    }
+
+    public boolean Q() {
+        return this.var_boolean_S;
+    }
+
+    public void Y() {
+        if (ForgeVersion.MC_1_7_10.L()) {
+            this.D.add(new ChunkRenderRebuildEventMappingTask());
+            this.D.add(new RenderBlocksEventMappingTask());
+        } else if (ForgeVersion.MC_1_16_5.v()) {
+            this.D.add(new VisGraphXRayVisibilityMappingTask());
+            this.D.add(new BlockRenderColorOpacityMappingTask());
+            this.D.add(new BlockModelRenderEventMappingTask());
+            this.D.add(new BlockRenderLayerEventMappingTask());
+            this.D.add(new BlockLayerOverrideModernEventMappingTask());
+            this.D.add(new BlockLayerOverrideEventMappingTask());
+        }
+        this.d();
+        this.var_boolean_S = true;
+    }
+
+    public void L() {
+        RenderWorldPassExecutorDrainMappingTask renderWorldPassExecutorDrainMappingTask = new RenderWorldPassExecutorDrainMappingTask();
+        this.D.add(renderWorldPassExecutorDrainMappingTask);
+    }
+
+    static {
+        if (PrimaryMappingTaskSet.K()) {
+            PrimaryMappingTaskSet.B(true);
+        }
+    }
+}
+

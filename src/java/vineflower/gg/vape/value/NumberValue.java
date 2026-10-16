@@ -1,0 +1,188 @@
+package gg.vape.value;
+
+import gg.vape.Vape;
+import gg.vape.utils.MathUtil;
+import java.text.DecimalFormat;
+
+public class NumberValue extends Value<Double, NumberValue> {
+   private static final String DEFAULT_FORMAT_PATTERN = "#.##";
+   private final String unitSuffix;
+   private static int[] legacyState;
+   private final DecimalFormat displayFormat;
+   private double increment = 0.01;
+   private final String formatPattern;
+   private final double minimum;
+   private final double maximum;
+   private final DecimalFormat inputFormat;
+   private double absoluteClampLimit = 999999.0;
+
+   public String getUnitSuffix() {
+      return this.unitSuffix;
+   }
+
+   public NumberValue setMaximumFractionDigits(int digits) {
+      this.displayFormat.setMaximumFractionDigits(digits);
+      return this;
+   }
+
+   public static NumberValue create(
+      Object owner, String name, String legacyLabel, String formatPattern, String unitSuffix, double minimum, double defaultValue, double maximum
+   ) {
+      return new NumberValue(owner, name, defaultValue, minimum, maximum, formatPattern, unitSuffix);
+   }
+
+   public static NumberValue create(
+      Object owner, String name, String formatPattern, String unitSuffix, double minimum, double defaultValue, double maximum, double increment
+   ) {
+      NumberValue numberValue = new NumberValue(owner, name, defaultValue, minimum, maximum, formatPattern, unitSuffix);
+      numberValue.increment = increment;
+      return numberValue;
+   }
+
+   public DecimalFormat getInputFormat() {
+      return this.inputFormat;
+   }
+
+   public double getMinimum() {
+      return this.minimum;
+   }
+
+   @Override
+   public void parse(String serializedValue) {
+      if (!serializedValue.isEmpty()) {
+         this.setRawValue(Double.parseDouble(serializedValue));
+      }
+   }
+
+   public static NumberValue create(
+      Object owner,
+      String name,
+      String formatPattern,
+      String unitSuffix,
+      double minimum,
+      double defaultValue,
+      double maximum,
+      double increment,
+      String description
+   ) {
+      NumberValue numberValue = new NumberValue(owner, name, defaultValue, minimum, maximum, formatPattern, unitSuffix);
+      numberValue.setDescription(description);
+      numberValue.increment = increment;
+      return numberValue;
+   }
+
+   public static NumberValue create(Object owner, String name, String formatPattern, String unitSuffix, double minimum, double defaultValue, double maximum) {
+      return new NumberValue(owner, name, defaultValue, minimum, maximum, formatPattern, unitSuffix);
+   }
+
+   @Override
+   public String getDisplayValue() {
+      String displayValue = String.valueOf(this.getValue());
+      return this.displayFormat.format(this.getValue());
+   }
+
+   public void setValue(Double value) {
+      if (value == null) {
+         value = this.getDefaultValue();
+         if (value == null) {
+            value = (Double)super.getValue();
+         }
+
+         if (value == null) {
+            value = this.minimum;
+         }
+      }
+
+      if (value > this.absoluteClampLimit) {
+         value = this.absoluteClampLimit;
+      } else if (value < -this.absoluteClampLimit) {
+         value = -this.absoluteClampLimit;
+      }
+
+      super.setValue(MathUtil.roundToIncrement(value, this.increment));
+      this.notifyChanged();
+      if (this.getOwner() instanceof ColorValue) {
+         ((ColorValue)this.getOwner()).syncCompositeValue();
+      }
+   }
+
+   public static NumberValue createWithDescription(
+      Object owner, String name, String formatPattern, String unitSuffix, double minimum, double defaultValue, double maximum, String description
+   ) {
+      return new NumberValue(owner, name, defaultValue, minimum, maximum, formatPattern, unitSuffix).setDescription(description);
+   }
+
+   public void setRawValue(Double value) {
+      super.setValue(value);
+      this.notifyChanged();
+   }
+
+   public double getIncrement() {
+      return this.increment;
+   }
+
+   public Double getValue() {
+      Double current = (Double)super.getValue();
+      return current != null ? current : this.getDefaultValue();
+   }
+
+   public void setRoundedDefaultValue(Double value) {
+      double roundedValue = Math.round(value * 100.0) / 100.0;
+      super.setDefaultValue(roundedValue);
+   }
+
+   public static void setNumberLegacyState(int[] state) {
+      legacyState = state;
+   }
+
+   public double getMaximum() {
+      return this.maximum;
+   }
+
+   public void setAbsoluteClampLimit(double limit) {
+      this.absoluteClampLimit = limit;
+   }
+
+   private DecimalFormat createDecimalFormat() {
+      DecimalFormat decimalFormat;
+      try {
+         decimalFormat = new DecimalFormat(this.formatPattern);
+      } catch (Exception var3) {
+         Vape.logThrowable(var3);
+         decimalFormat = new DecimalFormat(DEFAULT_FORMAT_PATTERN);
+      }
+
+      decimalFormat.setMinimumIntegerDigits(1);
+      return decimalFormat;
+   }
+
+   public static int[] getNumberLegacyState() {
+      return legacyState;
+   }
+
+   public NumberValue copyDefinition() {
+      return new NumberValue(null, this.getName(), this.getValue(), this.minimum, this.maximum, this.formatPattern, this.unitSuffix);
+   }
+
+   public NumberValue copyValueDefinition() {
+      return this.copyDefinition();
+   }
+
+   public NumberValue(Object owner, String name, double defaultValue, double minimum, double maximum, String formatPattern, String unitSuffix) {
+      super(owner, name, defaultValue);
+      this.minimum = minimum;
+      this.maximum = maximum;
+      if (!unitSuffix.isEmpty()) {
+         unitSuffix = " " + unitSuffix;
+      }
+
+      this.unitSuffix = unitSuffix;
+      this.formatPattern = formatPattern;
+      this.inputFormat = this.createDecimalFormat();
+      this.displayFormat = this.createDecimalFormat();
+   }
+
+   static {
+      setNumberLegacyState(null);
+   }
+}

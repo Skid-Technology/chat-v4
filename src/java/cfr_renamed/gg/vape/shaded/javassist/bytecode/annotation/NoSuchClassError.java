@@ -1,0 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.shaded.javassist.bytecode.annotation;
+
+public class NoSuchClassError
+extends Error {
+    private final static long serialVersionUID = 1L;
+    private String className;
+
+    public NoSuchClassError(String className, Error cause) {
+        super(cause.toString(), cause);
+        this.className = className;
+    }
+
+    public String getClassName() {
+        return this.className;
+    }
+}
+

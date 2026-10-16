@@ -1,0 +1,391 @@
+# 60e47510.exe — import table (`objdump -p`)
+# Generated: 2026-10-16 (REA tools DOWN; local objdump + python only, no installs)
+#
+# == PE facts (verified via `objdump -p` + python PE-header parse) ==
+# File:  60e47510.exe  PE32+ x86-64, Vape V4 Minecraft loader
+# Size:  1364047 bytes
+# sha256 581a7ab6c901a9c51bb8fecb35ab91b62e12c03d302b4adc5e1a2be80044470c
+# Entry RVA:  0xc8050  (VA 0x1400c8050, inside .text)
+# ImageBase:  0x140000000
+# Linker:     14.51 (MajorLinkerVersion 14, MinorLinkerVersion 51)
+# Link date:  Sep 28 2026 (objdump local: Mon Sep 28 16:24:48 2026; COFF TimeDateStamp 0x6aba86c0 = UTC 15:24:48)
+# Subsystem:  2 (Windows GUI), DllCharacteristics 0x8160 (HIGH_ENTROPY_VA|DYNAMIC_BASE|NX_COMPAT|TERMINAL_SERVER_AWARE)
+# Sections:   6
+#   name     VAddr      VSize      RawSize    RawPtr     entropy(raw)
+#   .text    0x1000     0xc8911    0xc8a00 (821760)  0x400     6.5393
+#   .rdata   0xca000    0x3673a    0x36800 (223232)  0xc8e00   6.2087
+#   .data    0x101000   0xc18      0xa00   (2560)    0xff600   4.5261
+#   .pdata   0x102000   0x7d40     0x7e00  (32256)   0x100000  6.0036
+#   .rsrc    0x10a000   0x44290    0x44400 (279552)  0x107e00  7.0044
+#   .reloc   0x14f000   0xcc8      0xe00   (3584)    0x14c200  5.2606
+#   (VSize/RawSize/RawPtr parsed from section table at file off 0x220; entropy = Shannon, whole raw chunk, python stdlib only)
+# Import dir: RVA 0xfe344, size 0x1a4; IAT dir: RVA 0xca000, size 0x8d8. 20 DLLs. WS2_32.dll imports are ordinal-only (13 slots).
+# TLS dir present (entry 9, RVA 0xf2680, size 0x28); callbacks VA 0x1400ca968 -> cb[0]=0x0 (see src/NOTES.md).
+#
+# == Verbatim `objdump -p` import tables follow (DLL + Hint/Ord + Name) ==
+#
+The Import Tables:
+  lookup 000feda0 time 00000000 fwd 00000000 name 000fede0 addr 000ca8b8
+
+    DLL Name: d3d11.dll
+    Hint/Ord  Name
+           7  D3D11CreateDeviceAndSwapChain
+
+  lookup 000fedb0 time 00000000 fwd 00000000 name 000fee0a addr 000ca8c8
+
+    DLL Name: dwmapi.dll
+    Hint/Ord  Name
+           8  DwmExtendFrameIntoClientArea
+
+  lookup 000fe870 time 00000000 fwd 00000000 name 000fee26 addr 000ca388
+
+    DLL Name: SHELL32.dll
+    Hint/Ord  Name
+         432  ShellExecuteW
+
+  lookup 000fea90 time 00000000 fwd 00000000 name 000fee32 addr 000ca5a8
+
+    DLL Name: WS2_32.dll
+    Hint/Ord  Name
+           1
+         116
+           2
+           3
+          22
+          13
+         115
+           6
+          19
+          23
+          15
+          16
+           8
+
+  lookup 000fe520 time 00000000 fwd 00000000 name 000ff16c addr 000ca038
+
+    DLL Name: KERNEL32.dll
+    Hint/Ord  Name
+         582  GetCurrentThreadId
+        1464  SetUnhandledExceptionFilter
+         769  GetStartupInfoW
+        1480  Sleep
+         212  CreateDirectoryW
+         853  GetVolumeInformationW
+         673  GetModuleFileNameW
+         612  GetEnvironmentVariableW
+         624  GetFileAttributesW
+         280  CreateToolhelp32Snapshot
+         653  GetLastError
+        1121  Process32NextW
+        1012  LoadLibraryA
+        1119  Process32FirstW
+         157  CloseHandle
+        1047  Module32FirstW
+         733  GetProcAddress
+        1612  WideCharToMultiByte
+         578  GetCurrentProcessId
+        1479  SizeofResource
+        1038  LockResource
+        1018  LoadResource
+         446  FindResourceW
+         611  GetEnvironmentVariableA
+        1573  WaitForSingleObject
+        1534  UnmapViewOfFile
+         217  CreateEventW
+         616  GetExitCodeThread
+        1015  LoadLibraryW
+        1196  ReadProcessMemory
+         677  GetModuleHandleW
+         227  CreateFileMappingW
+        1042  MapViewOfFile
+        1059  MultiByteToWideChar
+         868  GlobalAlloc
+         875  GlobalFree
+         879  GlobalLock
+         886  GlobalUnlock
+         655  GetLocaleInfoA
+        1154  QueryPerformanceFrequency
+         468  FreeLibrary
+        1153  QueryPerformanceCounter
+         222  CreateFileA
+         632  GetFileSizeEx
+        1193  ReadFile
+         892  HeapAlloc
+         896  HeapFree
+         223  CreateFileMappingA
+         794  GetSystemTimeAsFileTime
+         922  InitializeSListHead
+        1049  Module32NextW
+
+  lookup 000fe880 time 00000000 fwd 00000000 name 000ff48e addr 000ca398
+
+    DLL Name: USER32.dll
+    Hint/Ord  Name
+         798  ScreenToClient
+         300  GetCapture
+         400  GetMessageExtraInfo
+          78  ClientToScreen
+         971  TrackMouseEvent
+         371  GetKeyboardLayout
+         354  GetForegroundWindow
+         818  SetCapture
+         831  SetCursor
+         314  GetClientRect
+         603  IsWindowUnicode
+         784  ReleaseCapture
+         833  SetCursorPos
+         330  GetCursorPos
+         682  OpenClipboard
+          80  CloseClipboard
+         237  EmptyClipboard
+         317  GetClipboardData
+         370  GetKeyState
+         510  GetWindowRect
+         122  CreateWindowExW
+         469  GetSystemMetrics
+         750  RegisterClassExW
+         671  MoveWindow
+         854  SetLayeredWindowAttributes
+         617  LoadIconW
+         615  LoadCursorW
+         171  DefWindowProcW
+         185  DestroyWindow
+         916  SetWindowLongPtrW
+         502  GetWindowLongPtrW
+         945  ShowWindow
+         193  DispatchMessageW
+         696  PeekMessageW
+         978  TranslateMessage
+         701  PostQuitMessage
+        1004  UpdateWindow
+         518  GetWindowThreadProcessId
+         516  GetWindowTextLengthW
+         700  PostMessageW
+         604  IsWindowVisible
+         273  EnumWindows
+         826  SetClipboardData
+         517  GetWindowTextW
+
+  lookup 000fe6c0 time 00000000 fwd 00000000 name 000fff5e addr 000ca1d8
+
+    DLL Name: MSVCP140.dll
+    Hint/Ord  Name
+         669  ?always_noconv@codecvt_base@std@@QEBA_NXZ
+        1022  ?in@?$codecvt@_WDU_Mbstatet@@@std@@QEBAHAEAU_Mbstatet@@PEBD1AEAPEBDPEA_W3AEAPEA_W@Z
+        1079  ?out@?$codecvt@_WDU_Mbstatet@@@std@@QEBAHAEAU_Mbstatet@@PEB_W1AEAPEB_WPEAD3AEAPEAD@Z
+         437  ?_Getcat@?$codecvt@_WDU_Mbstatet@@@std@@SA_KPEAPEBVfacet@locale@2@PEBV42@@Z
+        1043  ?is@?$ctype@_W@std@@QEBA_NF_W@Z
+         440  ?_Getcat@?$ctype@_W@std@@SA_KPEAPEBVfacet@locale@2@PEBV42@@Z
+         306  ??Bios_base@std@@QEBA_NXZ
+         965  ?good@ios_base@std@@QEBA_NXZ
+        1355  _Cnd_broadcast
+         651  ?_Xbad_alloc@std@@YAXXZ
+        1323  ?unshift@?$codecvt@_WDU_Mbstatet@@@std@@QEBAHAEAU_Mbstatet@@PEAD1AEAPEAD@Z
+        1425  _Query_perf_frequency
+         165  ??1_Lockit@std@@QEAA@XZ
+         109  ??0_Lockit@std@@QEAA@H@Z
+         629  ?_Throw_Cpp_error@std@@YAXH@Z
+         469  ?_Getgloballocale@locale@std@@CAPEAV_Locimp@12@XZ
+        1310  ?uncaught_exception@std@@YA_NXZ
+         977  ?id@?$ctype@_W@std@@2V0locale@2@A
+         494  ?_Id_cnt@id@locale@std@@0HA
+         655  ?_Xout_of_range@std@@YAXPEBD@Z
+         427  ?_Fiopen@std@@YAPEAU_iobuf@@PEBDHH@Z
+         654  ?_Xlength_error@std@@YAXPEBD@Z
+         971  ?id@?$codecvt@_WDU_Mbstatet@@@std@@2V0locale@2@A
+        1413  _Mtx_lock
+        1358  _Cnd_do_broadcast_at_thread_exit
+        1460  _Thrd_id
+        1424  _Query_perf_counter
+        1461  _Thrd_join
+        1417  _Mtx_unlock
+          53  ??0?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@IEAA@XZ
+         962  ?getloc@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@QEBA?AVlocale@2@XZ
+          16  ??0?$basic_ios@_WU?$char_traits@_W@std@@@std@@IEAA@XZ
+         505  ?_Init@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@IEAAXXZ
+          34  ??0?$basic_istream@_WU?$char_traits@_W@std@@@std@@QEAA@PEAV?$basic_streambuf@_WU?$char_traits@_W@std@@@1@_N@Z
+         539  ?_Ipfx@?$basic_istream@_WU?$char_traits@_W@std@@@std@@QEAA_N_N@Z
+          43  ??0?$basic_ostream@_WU?$char_traits@_W@std@@@std@@QEAA@PEAV?$basic_streambuf@_WU?$char_traits@_W@std@@@1@_N@Z
+         582  ?_Osfx@?$basic_ostream@_WU?$char_traits@_W@std@@@std@@QEAAXXZ
+         874  ?flush@?$basic_ostream@_WU?$char_traits@_W@std@@@std@@QEAAAEAV12@XZ
+        1225  ?setstate@?$basic_ios@_WU?$char_traits@_W@std@@@std@@QEAAXH_N@Z
+        1233  ?sgetc@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@QEAAGXZ
+        1242  ?snextc@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@QEAAGXZ
+        1248  ?sputc@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@QEAAG_W@Z
+        1251  ?sputn@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@QEAA_JPEB_W_J@Z
+         127  ??1?$basic_ios@_WU?$char_traits@_W@std@@@std@@UEAA@XZ
+         139  ??1?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@UEAA@XZ
+        1239  ?showmanyc@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@MEAA_JXZ
+        1349  ?xsgetn@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@MEAA_JPEA_W_J@Z
+        1352  ?xsputn@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@MEAA_JPEB_W_J@Z
+         133  ??1?$basic_istream@_WU?$char_traits@_W@std@@@std@@UEAA@XZ
+         238  ??5?$basic_istream@_WU?$char_traits@_W@std@@@std@@QEAAAEAV01@AEAH@Z
+         136  ??1?$basic_ostream@_WU?$char_traits@_W@std@@@std@@UEAA@XZ
+         289  ??6?$basic_ostream@_WU?$char_traits@_W@std@@@std@@QEAAAEAV01@H@Z
+         963  ?getloc@ios_base@std@@QEBA?AVlocale@2@XZ
+
+  lookup 000fe4f8 time 00000000 fwd 00000000 name 000fffdc addr 000ca010
+
+    DLL Name: IMM32.dll
+    Hint/Ord  Name
+         114  ImmSetCandidateWindow
+         107  ImmReleaseContext
+          59  ImmGetContext
+         119  ImmSetCompositionWindow
+
+  lookup 000fe4e8 time 00000000 fwd 00000000 name 000ffff4 addr 000ca000
+
+    DLL Name: D3DCOMPILER_47.dll
+    Hint/Ord  Name
+           1  D3DCompile
+
+  lookup 000fea80 time 00000000 fwd 00000000 name 0010013e addr 000ca598
+
+    DLL Name: VCRUNTIME140_1.dll
+    Hint/Ord  Name
+           0  __CxxFrameHandler4
+
+  lookup 000fe9e8 time 00000000 fwd 00000000 name 00100152 addr 000ca500
+
+    DLL Name: VCRUNTIME140.dll
+    Hint/Ord  Name
+          28  __current_exception_context
+          27  __current_exception
+           1  _CxxThrowException
+          29  __intrinsic_setjmp
+           8  __C_specific_handler
+          34  __std_exception_destroy
+          61  memmove
+          60  memcpy
+          33  __std_exception_copy
+          70  wcsstr
+          62  memset
+          35  __std_terminate
+          66  strstr
+          59  memcmp
+          58  memchr
+          64  strchr
+          65  strrchr
+          57  longjmp
+
+  lookup 000fec68 time 00000000 fwd 00000000 name 0010056c addr 000ca780
+
+    DLL Name: api-ms-win-crt-stdio-l1-1-0.dll
+    Hint/Ord  Name
+         137  ftell
+         120  fgetc
+         135  fseek
+          15  __stdio_common_vsprintf_s
+         158  ungetwc
+          20  __stdio_common_vswscanf
+          16  __stdio_common_vsscanf
+         129  fputwc
+          13  __stdio_common_vsprintf
+          47  _fseeki64
+          98  _wfopen
+         116  fclose
+         119  fflush
+           3  __stdio_common_vfprintf
+          84  _set_fmode
+           0  __acrt_iob_func
+          19  __stdio_common_vswprintf_s
+         136  fsetpos
+         123  fgetwc
+           1  __p__commode
+         138  fwrite
+         131  fread
+         157  ungetc
+         121  fgetpos
+         152  setvbuf
+
+  lookup 000fed38 time 00000000 fwd 00000000 name 0010058c addr 000ca850
+
+    DLL Name: api-ms-win-crt-string-l1-1-0.dll
+    Hint/Ord  Name
+          74  _wcsicmp
+         143  strncpy
+         163  wcslen
+         136  strcpy
+         139  strlen
+         134  strcmp
+         137  strcpy_s
+         142  strncmp
+
+  lookup 000febd8 time 00000000 fwd 00000000 name 001005ae addr 000ca6f0
+
+    DLL Name: api-ms-win-crt-runtime-l1-1-0.dll
+    Hint/Ord  Name
+          47  _get_wide_winmain_command_line
+          61  _register_thread_local_exe_atexit_callback
+          21  _c_exit
+          35  _exit
+          85  exit
+          55  _initterm_e
+          54  _initterm
+          53  _initialize_wide_environment
+          25  _configure_wide_argv
+          66  _set_app_type
+          64  _seh_filter_exe
+          22  _cexit
+          20  _beginthreadex
+          30  _crt_atexit
+          60  _register_onexit_function
+          52  _initialize_onexit_table
+         103  terminate
+
+  lookup 000feb20 time 00000000 fwd 00000000 name 001005d0 addr 000ca638
+
+    DLL Name: api-ms-win-crt-filesystem-l1-1-0.dll
+    Hint/Ord  Name
+          36  _unlock_file
+          22  _lock_file
+
+  lookup 000fed80 time 00000000 fwd 00000000 name 001005f6 addr 000ca898
+
+    DLL Name: api-ms-win-crt-utility-l1-1-0.dll
+    Hint/Ord  Name
+          25  qsort
+           6  _lrotl
+          15  abs
+
+  lookup 000feb38 time 00000000 fwd 00000000 name 00100618 addr 000ca650
+
+    DLL Name: api-ms-win-crt-heap-l1-1-0.dll
+    Hint/Ord  Name
+           8  _callnewh
+          25  malloc
+          26  realloc
+          24  free
+          22  _set_new_mode
+
+  lookup 000feb00 time 00000000 fwd 00000000 name 00100638 addr 000ca618
+
+    DLL Name: api-ms-win-crt-convert-l1-1-0.dll
+    Hint/Ord  Name
+          80  atoi
+          97  strtol
+         100  strtoul
+
+  lookup 000feb78 time 00000000 fwd 00000000 name 0010065a addr 000ca690
+
+    DLL Name: api-ms-win-crt-math-l1-1-0.dll
+    Hint/Ord  Name
+           9  __setusermatherr
+         275  sinf
+          75  acosf
+         145  cosf
+         279  sqrtf
+         208  ldexp
+         202  fmodf
+         186  fabs
+         266  roundf
+         255  powf
+         125  ceilf
+
+  lookup 000feb68 time 00000000 fwd 00000000 name 0010067a addr 000ca680
+
+    DLL Name: api-ms-win-crt-locale-l1-1-0.dll
+    Hint/Ord  Name
+           8  _configthreadlocale
+
+

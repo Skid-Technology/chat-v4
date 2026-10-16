@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: Vape 4.22 recovered Java payload
+Implementation-Version: 4.22-recovered
+Vape421-Target-Java: 8
+

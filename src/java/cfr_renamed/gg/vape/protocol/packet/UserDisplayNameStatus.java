@@ -1,0 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.protocol.packet;
+
+public enum UserDisplayNameStatus {
+    SUCCESSFUL,
+    COOLDOWN,
+    USERNAME_TAKEN,
+    USERNAME_VALIDATION_FAILED,
+    BANNED,
+    FAILED;
+
+    private final static UserDisplayNameStatus[] var_gg_vape_protocol_packet_UserDisplayNameStatus_arr_G;
+
+    static {
+        String[] stringArray = new String[]{"USERNAME_VALIDATION_FAILED", "BANNED", "SUCCESSFUL", "USERNAME_TAKEN", "COOLDOWN", "FAILED"};
+        var_gg_vape_protocol_packet_UserDisplayNameStatus_arr_G = new UserDisplayNameStatus[]{SUCCESSFUL, COOLDOWN, USERNAME_TAKEN, USERNAME_VALIDATION_FAILED, BANNED, FAILED};
+    }
+}
+

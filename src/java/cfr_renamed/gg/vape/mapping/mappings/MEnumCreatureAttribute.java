@@ -1,0 +1,150 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.mapping.mappings;
+
+import gg.vape.mapping.MappedClasses;
+import gg.vape.mapping.Mapping;
+import gg.vape.mapping.MappingField;
+import gg.vape.mapping.MappingFieldBuilder;
+import gg.vape.mapping.MappingMethod;
+import gg.vape.utils.datas.BlockData;
+import gg.vape.wrapper.impl.ForgeVersion;
+
+public class MEnumCreatureAttribute
+extends Mapping {
+    private MappingField var_gg_vape_mapping_MappingField_Z;
+    private MappingField var_gg_vape_mapping_MappingField_B;
+    private final MappingField var_gg_vape_mapping_MappingField_S;
+    private final MappingMethod var_gg_vape_mapping_MappingMethod_a;
+    private final MappingMethod var_gg_vape_mapping_MappingMethod_G;
+
+    private Object N(Object object, Object object2) {
+        return this.var_gg_vape_mapping_MappingMethod_a.invokeObject(object, object2);
+    }
+
+    public static Object X(MEnumCreatureAttribute mEnumCreatureAttribute, Object object, Object object2) {
+        return mEnumCreatureAttribute.N(object, object2);
+    }
+
+    public static Object E(MEnumCreatureAttribute mEnumCreatureAttribute) {
+        return mEnumCreatureAttribute.T();
+    }
+
+    public MEnumCreatureAttribute() {
+        this(BlockData.W());
+    }
+
+    private MEnumCreatureAttribute(String[] stringArray) {
+        super(MappedClasses.uB);
+        if (stringArray != null) {
+            MEnumCreatureAttribute mEnumCreatureAttribute;
+            String string;
+            boolean bl;
+            Class clazz;
+            Class[] classArray;
+            MEnumCreatureAttribute mEnumCreatureAttribute2;
+            String string2;
+            boolean bl2;
+            Class clazz2;
+            if (ForgeVersion.MC_1_20_6.d()) {
+                clazz2 = MappedClasses.Vo;
+                bl2 = true;
+                string2 = "type";
+                mEnumCreatureAttribute2 = this;
+                this.var_gg_vape_mapping_MappingField_Z = mEnumCreatureAttribute2.J(string2, bl2, clazz2);
+                Class<String> clazz22 = String.class;
+                boolean bl22 = true;
+                String string22 = "msgId";
+                Class clazz3 = MappedClasses.Vz;
+                MEnumCreatureAttribute mEnumCreatureAttribute22 = this;
+                this.var_gg_vape_mapping_MappingField_S = this.registerInstanceFieldForOwner(clazz3, string22, bl22, clazz22);
+                Class[] classArray2 = new Class[]{MappedClasses.Yl};
+                Class clazz4 = MappedClasses.uB;
+                boolean bl3 = true;
+                String string3 = "playerAttack";
+                Class clazz5 = MappedClasses.ZZ;
+                MEnumCreatureAttribute mEnumCreatureAttribute3 = this;
+                this.var_gg_vape_mapping_MappingMethod_a = this.registerInstanceMethodForOwner(clazz5, string3, bl3, clazz4, classArray2);
+            } else {
+                clazz2 = String.class;
+                bl2 = true;
+                string2 = "damageType";
+                mEnumCreatureAttribute2 = this;
+                this.var_gg_vape_mapping_MappingField_S = mEnumCreatureAttribute2.J(string2, bl2, clazz2);
+                Class[] classArray3 = new Class[]{MappedClasses.Yl};
+                Class clazz6 = MappedClasses.uB;
+                boolean bl4 = true;
+                String string4 = "causePlayerDamage";
+                MEnumCreatureAttribute mEnumCreatureAttribute4 = this;
+                this.var_gg_vape_mapping_MappingMethod_a = this.registerStaticMethod(string4, bl4, clazz6, classArray3);
+            }
+            if (ForgeVersion.MC_1_16_5.d()) {
+                classArray = new Class[]{};
+                clazz = MappedClasses.zc;
+                bl = true;
+                string = "getImmediateSource";
+                mEnumCreatureAttribute = this;
+                this.var_gg_vape_mapping_MappingMethod_G = mEnumCreatureAttribute.Y(string, bl, clazz, classArray);
+            } else {
+                classArray = new Class[]{};
+                clazz = MappedClasses.zc;
+                bl = true;
+                string = "getSourceOfDamage";
+                mEnumCreatureAttribute = this;
+                this.var_gg_vape_mapping_MappingMethod_G = mEnumCreatureAttribute.Y(string, bl, clazz, classArray);
+            }
+            if (ForgeVersion.MC_1_21_4.v()) {
+                clazz2 = MappedClasses.uB;
+                String string3 = ForgeVersion.c() >= 23 ? "FALL" : "fall";
+                MEnumCreatureAttribute mEnumCreatureAttribute3 = this;
+                this.var_gg_vape_mapping_MappingField_B = ((MappingFieldBuilder)mEnumCreatureAttribute3.fieldBuilder(string3, clazz2).setStaticMember(true)).buildField();
+            }
+            return;
+        }
+        Class[] classArray = new Class[]{MappedClasses.Yl};
+        Class clazz = MappedClasses.uB;
+        boolean bl = true;
+        String string = "causePlayerDamage";
+        MEnumCreatureAttribute mEnumCreatureAttribute = this;
+        this.var_gg_vape_mapping_MappingMethod_a = mEnumCreatureAttribute.registerStaticMethod(string, bl, clazz, classArray);
+        if (ForgeVersion.MC_1_16_5.d()) {
+            Class[] classArray2 = new Class[]{};
+            Class clazz7 = MappedClasses.zc;
+            boolean bl5 = true;
+            String string5 = "getImmediateSource";
+            MEnumCreatureAttribute mEnumCreatureAttribute5 = this;
+            mEnumCreatureAttribute5.Y(string5, bl5, clazz7, classArray2);
+        }
+        Class[] classArray3 = new Class[]{};
+        Class clazz8 = MappedClasses.zc;
+        boolean bl6 = true;
+        String string6 = "getSourceOfDamage";
+        MEnumCreatureAttribute mEnumCreatureAttribute6 = this;
+        this.var_gg_vape_mapping_MappingMethod_G = this.Y(string6, bl6, clazz8, classArray3);
+        if (ForgeVersion.MC_1_21_4.v()) {
+            Class clazz9 = MappedClasses.uB;
+            String string7 = ForgeVersion.c() >= 23 ? "FALL" : "fall";
+            MEnumCreatureAttribute mEnumCreatureAttribute7 = this;
+            this.var_gg_vape_mapping_MappingField_B = ((MappingFieldBuilder)this.fieldBuilder(string7, clazz9).setStaticMember(true)).buildField();
+        }
+        this.var_gg_vape_mapping_MappingField_S = null;
+    }
+
+    private String B(Object object) {
+        return (String)this.var_gg_vape_mapping_MappingField_S.getObject(object);
+    }
+
+    private Object n(Object object) {
+        return this.var_gg_vape_mapping_MappingMethod_G.invokeObject(object, new Object[0]);
+    }
+
+    private Object T() {
+        return this.var_gg_vape_mapping_MappingField_B.getObject(null);
+    }
+
+    private Object r(Object object) {
+        return this.var_gg_vape_mapping_MappingField_Z.getObject(object);
+    }
+}
+

@@ -1,0 +1,18 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.shaded.javassist;
+
+public class NotFoundException
+extends Exception {
+    private final static long serialVersionUID = 1L;
+
+    public NotFoundException(String msg) {
+        super(msg);
+    }
+
+    public NotFoundException(String msg, Exception e) {
+        super(msg + " because of " + e.toString());
+    }
+}
+

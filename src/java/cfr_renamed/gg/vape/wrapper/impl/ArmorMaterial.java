@@ -1,0 +1,35 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.wrapper.impl;
+
+import gg.vape.mapping.mappings.MArmorMaterial;
+import gg.vape.wrapper.Wrapper;
+
+public class ArmorMaterial
+extends Wrapper {
+    public static ArmorMaterial gold() {
+        return new ArmorMaterial(MArmorMaterial.getGold(ArmorMaterial.vapeInstance.getMappingsMapperCompat().var_gg_vape_mapping_mappings_MArmorMaterial_e));
+    }
+
+    public static ArmorMaterial iron() {
+        return new ArmorMaterial(MArmorMaterial.getIron(ArmorMaterial.vapeInstance.getMappingsMapperCompat().var_gg_vape_mapping_mappings_MArmorMaterial_e));
+    }
+
+    public static ArmorMaterial chain() {
+        return new ArmorMaterial(MArmorMaterial.getChain(ArmorMaterial.vapeInstance.getMappingsMapperCompat().var_gg_vape_mapping_mappings_MArmorMaterial_e));
+    }
+
+    public static ArmorMaterial leather() {
+        return new ArmorMaterial(MArmorMaterial.getLeather(ArmorMaterial.vapeInstance.getMappingsMapperCompat().var_gg_vape_mapping_mappings_MArmorMaterial_e));
+    }
+
+    public ArmorMaterial(Object wrappedObject) {
+        super(wrappedObject);
+    }
+
+    public static ArmorMaterial diamond() {
+        return new ArmorMaterial(MArmorMaterial.getDiamond(ArmorMaterial.vapeInstance.getMappingsMapperCompat().var_gg_vape_mapping_mappings_MArmorMaterial_e));
+    }
+}
+

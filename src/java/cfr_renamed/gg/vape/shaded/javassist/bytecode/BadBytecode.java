@@ -1,0 +1,28 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.shaded.javassist.bytecode;
+
+import gg.vape.shaded.javassist.bytecode.MethodInfo;
+
+public class BadBytecode
+extends Exception {
+    private final static long serialVersionUID = 1L;
+
+    public BadBytecode(int opcode) {
+        super("bytecode " + opcode);
+    }
+
+    public BadBytecode(String msg) {
+        super(msg);
+    }
+
+    public BadBytecode(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public BadBytecode(MethodInfo minfo, Throwable cause) {
+        super(minfo.toString() + " in " + minfo.getConstPool().getClassName() + ": " + cause.getMessage(), cause);
+    }
+}
+

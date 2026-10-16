@@ -1,0 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package gg.vape.wrapper.impl;
+
+import gg.vape.wrapper.Wrapper;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
+public class AtomicReferenceArrayBridge
+extends Wrapper {
+    public AtomicReferenceArray getChunks() {
+        return (AtomicReferenceArray)AtomicReferenceArrayBridge.vapeInstance.getMappingsMapperCompat().var_gg_vape_mapping_mappings_MAtomicReferenceArrayBridge_H.getChunks(this.I);
+    }
+
+    public AtomicReferenceArrayBridge(Object wrappedObject) {
+        super(wrappedObject);
+    }
+}
+
