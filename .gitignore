@@ -28,15 +28,8 @@ __pycache__/
 /payload_jar/
 /src/payload/target/
 
-# Vendored decompiler binaries — fetch with scripts/fetch-tools.sh
+# Local dev tools (decompilers), never committed
 /tools/*.jar
-
-# Staging dir for `vape_loader.py decompile` when no -o is given
-/.decompiled/
-
-# Staging dir used by scripts/update-payload.sh while decompiling
-/src/decompiled.tmp/
-/src/decompiled.tmp.old/
 
 # Vendored deobfuscator build output
 /zkm-flowdeobf/build/

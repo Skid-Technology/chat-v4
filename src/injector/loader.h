@@ -16,7 +16,7 @@
 #define PATH_LOADER_LOGIN    "/loader/login"
 #define ZEUS_DEFAULT         "zeus-prod.vape.chat:8091"
 
-/* --- bootstrap block (see src/clean/bootstrap_inject.c) --- */
+/* --- bootstrap block --- */
 #define BOOTSTRAP_SIZE   0x1A8u
 #define BOOTSTRAP_MAGIC  0x54423456u /* "VB4T" */
 #define BOOTSTRAP_VER    0x1A80002u
@@ -75,7 +75,7 @@ typedef struct {
     int from_bundle; /* 1 = bundled, 0 = downloaded */
 } payload_t;
 
-/* OS backend: implemented by os_win32.c / os_stub.c. */
+/* OS backend: the portable implementation is os_stub.c; ui_win32.c drives it. */
 typedef struct {
     /* process + memory */
     int (*open_process)(uint32_t pid, void **handle);
@@ -97,6 +97,10 @@ typedef struct {
     /* browser */
     int (*browser_open)(const char *url);
 } os_api_t;
+
+/* Portable backend from os_stub.c: walks the real pipeline against a
+ * simulated process. Used by the console test binary and the Windows UI. */
+extern const os_api_t OS_STUB;
 
 /* Pipeline entry points (loader.c). */
 int stage_validate_pe(const uint8_t *data, size_t len, const char **err);

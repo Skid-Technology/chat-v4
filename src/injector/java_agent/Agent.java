@@ -29,16 +29,34 @@ import java.util.Map;
 
 public final class Agent {
 
+    /** Branding. */
+    static final String BRAND = "Skid Solutions";
+    static final String BRAND_URL = "https://discord.gg/AEwatvnvSf";
+
     private static final int MAGIC = 0x56424C44; /* "VBDL" */
 
     public static void premain(String agentArgs, Instrumentation inst) {
-        System.out.println("[Agent] v4-chat loader agent — premain (" + osTag() + ")");
+        System.out.println("[Agent] " + BRAND + " - Vape V4 agent - premain (" + osTag() + ")");
+        splash();
         run(agentArgs, inst);
     }
 
     public static void agentmain(String agentArgs, Instrumentation inst) {
-        System.out.println("[Agent] v4-chat loader agent — agentmain (dynamic attach)");
+        System.out.println("[Agent] " + BRAND + " - Vape V4 agent - agentmain (dynamic attach)");
         run(agentArgs, inst);
+    }
+
+    /* The Skid Solutions splash, on by default. Skipped on a headless JVM and
+     * when -Dskid.splash=false is passed; decorative, so never fatal. */
+    private static void splash() {
+        if (!Boolean.parseBoolean(System.getProperty("skid.splash", "true")))
+            return;
+        try {
+            if (java.awt.GraphicsEnvironment.isHeadless())
+                return;
+            Skid.run();
+        } catch (Throwable ignored) {
+        }
     }
 
     private static void run(String agentArgs, Instrumentation inst) {

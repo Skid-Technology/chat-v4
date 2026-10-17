@@ -1,38 +1,18 @@
-# java_agent — Mac/injection side of the recreated loader
+# java_agent — macOS / Linux side of the loader
 
-No login — works with `bundle.dat` (or raw `payload.bin`) directly.
-
-## Build (already built)
-
-```
-cd src/injector/java_agent
-javac Agent.java && jar -cfm agent.jar MANIFEST.MF Agent.class
-```
-
-Produces `agent.jar` (verified: `Premain-Class: Agent`, `Agent-Class: Agent`).
-
-## Run (Mac, any JVM with java.lang.instrument)
+`make agent` at the repo root builds `agent.jar` (premain + agentmain) and the
+Skid Solutions splash that goes with it.
 
 ```sh
-# From workspace (uses bundle.dat, no auth/network)
-java -javaagent:src/injector/java_agent/agent.jar \
-     -cp payload_jar/vape_client_deobf_full.jar \
-     gg.vape.Vape
-
-# With the reconstructed loader's payload already loaded via loader_test
-# (the native inject already set the bootstrap; agent just attaches to
-#  the running java process to verify / hook)
+java -Dskid.splash=false \
+     -javaagent:src/injector/java_agent/agent.jar=verbose \
+     -cp <client>.jar gg.vape.Vape
 ```
 
-## What it does (mirrors loader.c + FUN_140021550)
+Args are `key=value[,key=value…]`: `bundle=`, `client=`, `verbose`. Without a
+`bundle=` argument the agent looks for `bundle.dat` next to itself and in the
+working directory.
 
-1. Reads `bundle.dat` → verifies `VBDL` magic, verifies payload SHA-256
-   (`sha256.c`) against the embedded digest.
-2. Loads the deobfuscated `vape_client_deobf_full.jar` via `URLClassLoader`.
-3. Resolves `gg.vape.Vape.INSTANCE`, confirms `renderReady` state.
-4. Prints status (no hidden network call — matches the bundled path).
-
-Build verified: `javac` + `jar` pass; `java -javaagent:` produces 3 lines of
-agent output + 1 stack error (the deobf class's synthetic gaps, not a failure
-of the agent). The agent itself is portable C/Java — builds on Mac, Linux,
-Windows.
+The splash is on by default; it is skipped on a headless JVM and when
+`-Dskid.splash=false` is set. `attach.sh` is the dynamic-attach path for a
+JVM that is already running.

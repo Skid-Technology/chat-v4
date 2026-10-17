@@ -1,14 +1,14 @@
 name: release
 
-# Every commit to main publishes a pre-release that is built entirely from
-# src/ — nothing is downloaded and no payload binary is committed:
+# Every commit to main publishes a pre-release built entirely from src/ —
+# nothing is downloaded and no payload binary is committed or published:
 #
-#   src/payload (Java source)                     -> vape_client.jar   (Maven + shade)
-#   vape_client.jar                               -> bundle.dat        (bundle.py)
-#   loader + bundle.dat                           -> injector-<os>     (embed.py, one file)
-#   src/injector/java_agent (Java source)         -> agent.jar         (for macOS/Linux users)
+#   src/payload (Java source)              -> vape_client.jar   (Maven + shade)
+#   vape_client.jar                        -> bundle.dat        (bundle.py)
+#   src/injector/ui_win32.c + injection    -> injector.exe      (mingw + embed.py)
+#   src/injector/java_agent (Java source)  -> agent.jar         (for macOS/Linux)
 #
-# Assets: injector (self-contained: the payload is inside it) + agent.jar.
+# Assets: injector.exe (Windows, native UI, payload inside it) + agent.jar.
 on:
   push:
     branches: [main]
@@ -50,14 +50,10 @@ jobs:
           path: src/payload/target/vape_client.jar
           if-no-files-found: error
 
-  injector:
-    name: injector (${{ matrix.os }})
+  windows:
+    name: windows injector (native ui)
     needs: payload
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -66,29 +62,26 @@ jobs:
           name: payload
           path: payload
 
-      - name: Build the native loader
-        run: make injector
+      - name: Install the mingw-w64 cross compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64
 
       - name: Bundle the payload
         run: python3 src/injector/bundle.py payload/vape_client.jar -o bundle.dat
 
-      - name: Build the single-file injector
-        run: |
-          mkdir -p dist
-          out="dist/injector-${{ runner.os }}"
-          python3 src/injector/embed.py src/injector/loader_test bundle.dat "$out"
-          if [ "${{ runner.os }}" = "macOS" ]; then
-            codesign --force --sign - "$out" || echo "codesign unavailable, skipping"
-          fi
-          ls -l "$out"
+      - name: Verify the injection logic (same sources, native build)
+        run: make test
 
-      - name: Self-test the single file (runs with no arguments)
-        run: ./dist/injector-${{ runner.os }}
+      - name: Build injector.exe (native ui + injection logic + payload)
+        run: |
+          make windows
+          make verify
 
       - uses: actions/upload-artifact@v4
         with:
-          name: injector-${{ matrix.os }}
-          path: dist/injector-*
+          name: injector
+          path: dist/injector.exe
           if-no-files-found: error
 
   agent:
@@ -105,9 +98,10 @@ jobs:
       - name: Build the agent from source
         run: make agent
 
-      - name: Smoke-test premain
+      - name: Smoke-test premain (splash off: there is no display here)
         run: |
-          java -javaagent:src/injector/java_agent/agent.jar=verbose \
+          java -Dskid.splash=false \
+               -javaagent:src/injector/java_agent/agent.jar=verbose \
                -cp src/injector/java_agent Probe
 
       - uses: actions/upload-artifact@v4
@@ -118,7 +112,7 @@ jobs:
 
   release:
     name: pre-release
-    needs: [injector, agent]
+    needs: [windows, agent]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -130,8 +124,7 @@ jobs:
       - name: Assemble the assets
         run: |
           mkdir -p release
-          cp artifacts/injector-macos-latest/injector-* release/injector-macos
-          cp artifacts/injector-ubuntu-latest/injector-* release/injector-linux
+          cp artifacts/injector/injector.exe release/injector.exe
           cp artifacts/agent/agent.jar release/agent.jar
           ls -l release
 
