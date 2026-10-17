@@ -1,0 +1,94 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  native:
+    name: native loader (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build native loader
+        run: make injector
+
+      - name: Build bundle
+        run: make bundle
+
+      - name: Test (offline bundled path)
+        run: make test
+
+      - name: Stage binary
+        run: |
+          mkdir -p dist
+          cp src/injector/loader_test "dist/loader_test-${{ matrix.os }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: loader-${{ matrix.os }}
+          path: dist/loader_test-${{ matrix.os }}
+          if-no-files-found: error
+
+  agent:
+    name: java agent
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build agent
+        run: make agent
+
+      - name: Smoke-test premain
+        run: |
+          java -javaagent:src/injector/java_agent/agent.jar=verbose \
+               -cp src/injector/java_agent Probe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agent
+          path: src/injector/java_agent/agent.jar
+          if-no-files-found: error
+
+  release:
+    name: publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [native, agent]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Build bundle
+        run: make bundle
+
+      - name: Assemble release assets
+        run: |
+          mkdir -p release
+          cp artifacts/loader-macos-latest/loader_test-macos-latest release/loader_test-macos
+          cp artifacts/loader-ubuntu-latest/loader_test-ubuntu-latest release/loader_test-linux
+          cp artifacts/agent/agent.jar release/agent.jar
+          cp bundle.dat release/bundle.dat
+          ls -la release
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

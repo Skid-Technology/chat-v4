@@ -1,0 +1,4 @@
+[submodule "zkm-flowdeobf"]
+	path = zkm-flowdeobf
+	url = https://github.com/OpenVapeCN/zkm-flowdeobf
+	ignore = untracked

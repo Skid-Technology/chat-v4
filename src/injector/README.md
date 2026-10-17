@@ -12,9 +12,13 @@ src/injector/
   loader.c         pipeline: auth -> acquire -> validate -> inject -> ack-wait
   os_win32.c       Windows backend (real APIs; build with MSVC/MinGW on Windows)
   os_stub.c        stub backend: runs portable logic anywhere (validates bundle)
+  sha256.c         SHA-256 (verify payload against the bundle digest)
   bundle.py        packs payload.bin + vape_client.jar into bundle.dat
-  Makefile         builds the stub test binary here
+  Makefile         builds the loader test binary + Java agent
+  java_agent/      macOS Java instrumentation agent (premain + attach)
 ```
+
+Build (repo root): `make injector` (native), `make agent` (Java).
 
 Payloads live in the workspace root and are **referenced, not copied**:
 
@@ -40,7 +44,7 @@ blob data (payload.bin, vape_client.jar)
 
 ```sh
 python3 src/injector/bundle.py payload.bin payload_jar/vape_client.jar
-make -C src/injector && ./src/injector/loader_test
+make -C src/injector && ./src/injector/loader_test bundle.dat
 ```
 
 ## Pipeline (mirrors FUN_140007c30 dispatcher)
