@@ -98,7 +98,7 @@ jobs:
       - name: Build the agent from source
         run: make agent
 
-      - name: Smoke-test premain (splash off: there is no display here)
+      - name: Smoke-test premain (no display here, splash switched off)
         run: |
           java -Dskid.splash=false \
                -javaagent:src/injector/java_agent/agent.jar=verbose \
