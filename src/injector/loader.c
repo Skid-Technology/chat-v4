@@ -86,6 +86,68 @@ int stage_validate_pe(const uint8_t *data, size_t len, const char **err)
     return 0;
 }
 
+int stage_validate_jar(const uint8_t *data, size_t len, const char **err)
+{
+    size_t i, end, lim;
+    if (data == NULL || len < 22) {
+        *err = "Payload is too small to be a valid JAR";
+        return -1;
+    }
+    if (memcmp(data, "PK\x03\x04", 4) != 0) {
+        *err = "Payload is not a JAR (no ZIP local file header)";
+        return -1;
+    }
+    /* the end-of-central-directory record sits within the last 64 KiB */
+    end = len - 22;
+    lim = len > 0x10016 ? len - 0x10016 : 0;
+    for (i = end + 1; i-- > lim; ) {
+        if (memcmp(data + i, "PK\x05\x06", 4) == 0) {
+            *err = NULL;
+            return 0;
+        }
+    }
+    *err = "Payload is not a JAR (no end-of-central-directory record)";
+    return -1;
+}
+
+/* The reconstructed payload is the Java client, so accept either shape.
+ * The error reported on failure is the PE one, i.e. what the original
+ * pipeline expected to see. */
+int stage_validate_payload(const uint8_t *data, size_t len, const char **err)
+{
+    const char *pe_err = NULL;
+    if (stage_validate_pe(data, len, &pe_err) == 0) {
+        *err = NULL;
+        return 0;
+    }
+    if (stage_validate_jar(data, len, err) == 0)
+        return 0;
+    *err = pe_err;
+    return -1;
+}
+
+/* Single-file injector: the bundle is appended to the executable, followed
+ * by a 24-byte trailer (magic + u64 offset + u64 size). */
+int find_embedded_bundle(const uint8_t *self, size_t n,
+                         const uint8_t **blob, size_t *len)
+{
+    const uint8_t *t;
+    uint64_t off, size;
+    if (self == NULL || n <= EMBED_TRAILER_SIZE)
+        return -1;
+    t = self + n - EMBED_TRAILER_SIZE;
+    if (memcmp(t, EMBED_MAGIC, 8) != 0)
+        return -1;
+    off  = rd64(t + 8);
+    size = rd64(t + 16);
+    if (off > n - EMBED_TRAILER_SIZE ||
+        size > n - EMBED_TRAILER_SIZE - off)
+        return -2;
+    *blob = self + off;
+    *len  = (size_t)size;
+    return 0;
+}
+
 int stage_build_bootstrap(bootstrap_t *b, uint32_t pid, const char *dll_path,
                           const char *zeus_host, uint16_t ctrl_port)
 {
@@ -126,7 +188,7 @@ int run_loader(const os_api_t *os, const payload_t *payload, uint32_t pid,
     uint32_t code = 0;
     int rc = -1;
 
-    if (stage_validate_pe(payload->data, payload->len, err))
+    if (stage_validate_payload(payload->data, payload->len, err))
         return -1;
     if (stage_build_bootstrap(&local, pid, dll_path, zeus_host, ctrl_port)) {
         *err = "VAPE_ONLINE_BASE_URL is too long for the bootstrap";

@@ -21,8 +21,16 @@ identity_rethrows=removed exception_ranges=normalized zkm_shared_tails=normalize
 residual_stacks=materialized binary_sentinel_tails=specialized
 reference_sentinel_tails=specialized constant_residual_islands=cleaned`.
 
-The input jar held 8,206 entries; the scanner still reports 7,604 classes. CFR
-0.152 produced `src/decompiled` — 5,325 `.java` files, 3,335 under `gg/vape`.
+The input jar held 8,206 entries; the scanner still reports 7,604 classes.
+Decompiling it produced 5,353 `.java` files. What is vendored as the buildable
+payload is Vape's own code — `src/payload/java/gg/vape/**` (2,954 files) plus
+`func/` — with the relocated `gg/vape/shaded` left out, because ASM and
+Javassist now come from Maven and are re-relocated by the shade plugin (see
+`docs/BUILD.md`).
+
+The decompiler is **Vineflower 1.11.2**, not CFR: on this jar CFR 0.152 emits
+114 syntax errors (`'finally' without 'try'`, `illegal start of expression`,
+`$Gson$Types`…), Vineflower 6 — and those 6 are one pattern, rewritten by hand.
 
 Everything below documents the original 2026-10-16 pass and stays accurate for
 that capture.

@@ -17,6 +17,6 @@ shasum -a 256 "$DIR"/payload.bin "$DIR"/payload_jar/vape_client.jar | awk '{prin
 echo "=== deobf artifacts (if present) ==="
 ls -la "$DIR"/payload_jar/vape_client_deobf*.jar 2>/dev/null || echo "none yet"
 echo "=== decompiled sources ==="
-test -d "$DIR/src/decompiled" && echo "src/decompiled: $(find "$DIR/src/decompiled" -type f | wc -l | tr -d ' ') files" || echo "none"
+test -d "$DIR/src/payload/java" && echo "src/payload/java: $(find "$DIR/src/payload/java" -name '*.java' | wc -l | tr -d ' ') .java files" || echo "none"
 echo "=== mockup source ==="; ls -la "$DIR"/ui/replica.html
 echo "=== done ==="

@@ -1,16 +1,58 @@
 name: release
 
+# Every commit to main publishes a pre-release that is built entirely from
+# src/ — nothing is downloaded and no payload binary is committed:
+#
+#   src/payload (Java source)                     -> vape_client.jar   (Maven + shade)
+#   vape_client.jar                               -> bundle.dat        (bundle.py)
+#   loader + bundle.dat                           -> injector-<os>     (embed.py, one file)
+#   src/injector/java_agent (Java source)         -> agent.jar         (for macOS/Linux users)
+#
+# Assets: injector (self-contained: the payload is inside it) + agent.jar.
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  native:
-    name: native loader (${{ matrix.os }})
+  payload:
+    name: payload (built from src/payload)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Compile the client from source
+        run: mvn -B -q -f src/payload/pom.xml package
+
+      - name: Report
+        run: |
+          jar=src/payload/target/vape_client.jar
+          ls -l "$jar"
+          sha256sum "$jar"
+          unzip -l "$jar" | tail -1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: payload
+          path: src/payload/target/vape_client.jar
+          if-no-files-found: error
+
+  injector:
+    name: injector (${{ matrix.os }})
+    needs: payload
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,28 +61,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build native loader
+      - uses: actions/download-artifact@v4
+        with:
+          name: payload
+          path: payload
+
+      - name: Build the native loader
         run: make injector
 
-      - name: Build bundle
-        run: make bundle
+      - name: Bundle the payload
+        run: python3 src/injector/bundle.py payload/vape_client.jar -o bundle.dat
 
-      - name: Test (offline bundled path)
-        run: make test
-
-      - name: Stage binary
+      - name: Build the single-file injector
         run: |
           mkdir -p dist
-          cp src/injector/loader_test "dist/loader_test-${{ matrix.os }}"
+          out="dist/injector-${{ runner.os }}"
+          python3 src/injector/embed.py src/injector/loader_test bundle.dat "$out"
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            codesign --force --sign - "$out" || echo "codesign unavailable, skipping"
+          fi
+          ls -l "$out"
+
+      - name: Self-test the single file (runs with no arguments)
+        run: ./dist/injector-${{ runner.os }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: loader-${{ matrix.os }}
-          path: dist/loader_test-${{ matrix.os }}
+          name: injector-${{ matrix.os }}
+          path: dist/injector-*
           if-no-files-found: error
 
   agent:
-    name: java agent
+    name: java agent (macOS / Linux)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +102,7 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Build agent
+      - name: Build the agent from source
         run: make agent
 
       - name: Smoke-test premain
@@ -65,9 +117,8 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: publish release
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [native, agent]
+    name: pre-release
+    needs: [injector, agent]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -76,19 +127,26 @@ jobs:
         with:
           path: artifacts
 
-      - name: Build bundle
-        run: make bundle
-
-      - name: Assemble release assets
+      - name: Assemble the assets
         run: |
           mkdir -p release
-          cp artifacts/loader-macos-latest/loader_test-macos-latest release/loader_test-macos
-          cp artifacts/loader-ubuntu-latest/loader_test-ubuntu-latest release/loader_test-linux
+          cp artifacts/injector-macos-latest/injector-* release/injector-macos
+          cp artifacts/injector-ubuntu-latest/injector-* release/injector-linux
           cp artifacts/agent/agent.jar release/agent.jar
-          cp bundle.dat release/bundle.dat
-          ls -la release
+          ls -l release
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: release/*
-          generate_release_notes: true
+      - name: Publish the pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="build-$(echo "$GITHUB_SHA" | cut -c1-7)"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" release/* --clobber
+          else
+            gh release create "$tag" \
+              --prerelease \
+              --target "$GITHUB_SHA" \
+              --title "$tag" \
+              --generate-notes \
+              release/*
+          fi

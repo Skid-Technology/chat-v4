@@ -2,7 +2,7 @@
 # fetch-tools.sh — download the vendored decompilers into tools/.
 #
 # These jars are not committed (see .gitignore). Only needed if you want to
-# regenerate src/decompiled/ — the decompiled sources are already in the repo.
+# regenerate src/payload/java/ — the payload sources are already in the repo.
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

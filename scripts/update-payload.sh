@@ -28,8 +28,9 @@ PAYLOAD="$ROOT/payload.bin"
 JAR="$ROOT/payload_jar/vape_client.jar"
 DEOBF_JAR="$ROOT/payload_jar/vape_client_deobf_full.jar"
 REPORT="$ROOT/payload_jar/deobf_report_full.tsv"
-SRC="$ROOT/src/decompiled"
-TMP="$ROOT/src/decompiled.tmp"
+PAYLOAD_DIR="$ROOT/src/payload"          # the vendored payload source (committed)
+DEC_TMP="$ROOT/.decompiled"              # staging tree for the decompile
+NEW="$ROOT/.payload.new"                 # staging tree for the install
 
 DO_LOGIN=0      # 0 = only if no token, 1 = force, -1 = never
 DO_DEOBF=1
@@ -124,32 +125,33 @@ else
   step "4/6 deobf — skipped (--no-deobf)"
 fi
 
-# ── 5. decompile + swap ──────────────────────────────────────
-step "5/6 decompile — CFR into a staging tree, swap in only if it looks sane"
-run rm -rf "$TMP" "$TMP.old"
-run "$PY" "$CLI" decompile "$DEOBF_JAR" -o "$TMP"
+# ── 5. decompile + install the source ────────────────────────
+step "5/6 decompile — Vineflower, then install src/payload (Vape's code + resources)"
+run rm -rf "$DEC_TMP" "$NEW"
+run "$PY" "$CLI" decompile "$DEOBF_JAR" -o "$DEC_TMP"
+run "$PY" "$ROOT/scripts/install-payload-src.py" "$DEC_TMP" "$JAR" "$NEW"
 if [ "$DRY" = 0 ]; then
-  n=$(find "$TMP" -name '*.java' | wc -l | tr -d ' ')
-  v=$(find "$TMP/gg/vape" -name '*.java' 2>/dev/null | wc -l | tr -d ' ')
-  if [ "$n" -lt 1000 ] || [ "$v" -lt 100 ]; then
-    echo "   decompile looks wrong ($n .java, $v under gg/vape) — keeping $SRC" >&2
+  n=$(find "$NEW/java" -name '*.java' 2>/dev/null | wc -l | tr -d ' ')
+  r=$(find "$NEW/resources" -type f 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$n" -lt 2000 ] || [ "$r" -lt 50 ]; then
+    echo "   install looks wrong ($n .java, $r resources) — leaving $PAYLOAD_DIR alone" >&2
     exit 1
   fi
-  note "$n .java files ($v under gg/vape)"
-  [ -d "$SRC" ] && run mv "$SRC" "$TMP.old"
-  run mv "$TMP" "$SRC"
-  run rm -rf "$TMP.old"
+  note "$n .java files, $r resource files (pom.xml kept)"
+  run rm -rf "$PAYLOAD_DIR/java" "$PAYLOAD_DIR/resources"
+  run mv "$NEW/java" "$PAYLOAD_DIR/java"
+  run mv "$NEW/resources" "$PAYLOAD_DIR/resources"
+  run rm -rf "$NEW" "$DEC_TMP"
 fi
 
-# ── 6. bundle + verify ───────────────────────────────────────
-step "6/6 bundle — repack bundle.dat, then build and self-test"
-run rm -f "$ROOT/bundle.dat"
+# ── 6. rebuild from source + verify ──────────────────────────
+step "6/6 verify — rebuild the payload from src/payload, repack bundle.dat, self-test"
 run make -C "$ROOT" bundle
 [ "$DO_TEST" = 1 ] && run make -C "$ROOT" test
 
 if [ "$DO_STAGE" = 1 ] && [ "$DRY" = 0 ]; then
   step "stage — git add the refreshed artifacts"
-  run git -C "$ROOT" add -A -- payload.bin payload_jar/vape_client.jar src/decompiled
+  run git -C "$ROOT" add -A -- src/payload
 fi
 
 # ── summary ──────────────────────────────────────────────────
@@ -157,7 +159,7 @@ step "summary"
 if [ "$DRY" = 1 ]; then
   note "dry run — nothing was executed or written"
 else
-  for f in "$PAYLOAD" "$JAR" "$DEOBF_JAR" "$ROOT/bundle.dat"; do
+  for f in "$PAYLOAD" "$JAR" "$DEOBF_JAR" "$ROOT/src/payload/target/vape_client.jar" "$ROOT/bundle.dat"; do
     [ -f "$f" ] || continue
     printf '   %-38s %11s B' "${f#$ROOT/}" "$(wc -c < "$f" | tr -d ' ')"
     case "$f" in

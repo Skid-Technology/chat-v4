@@ -1,0 +1,212 @@
+package gg.vape.ui.click.component.input;
+
+import gg.vape.input.BindActivationMode;
+import gg.vape.input.BindCaptureTask;
+import gg.vape.input.KeyboardInput;
+import gg.vape.ui.click.component.ToolTips;
+import gg.vape.ui.click.component.TruncatedTextComponent;
+import gg.vape.ui.click.component.gui.InteractiveComponent;
+import gg.vape.unmap.Bendable;
+import gg.vape.unmap.ColorUtil;
+import gg.vape.utils.render.GuiRenderPrimitives;
+import gg.vape.utils.render.ImageRenderer;
+import java.awt.Color;
+import org.jetbrains.annotations.Nullable;
+
+public class BindableInputComponent extends InteractiveComponent {
+   private final TruncatedTextComponent bindLabel;
+   private int activeAlpha;
+   private boolean highlighted;
+   private Color accentColor;
+   private Bendable bendable;
+   private final BindCaptureTask captureTask;
+   @Nullable
+   private Boolean activeOverride = null;
+   private static final long LEGACY_ALPHA_SEED = -6023760571160068045L;
+   private final Color inactiveColor = new Color(255, 255, 255, 100);
+   private float alphaMultiplier = 1.0F;
+
+   public boolean isHighlighted() {
+      return this.highlighted;
+   }
+
+   public void setAlphaMultiplier(float alphaMultiplier) {
+      this.alphaMultiplier = Math.max(0.0F, Math.min(1.0F, alphaMultiplier));
+   }
+
+   public void setBendable(Bendable bendable) {
+      this.bendable = bendable;
+      this.captureTask.setBendable(bendable);
+      this.bindLabel.setText(bendable.getBindText());
+   }
+
+   public BindCaptureTask getCaptureTask() {
+      return this.captureTask;
+   }
+
+   public BindableInputComponent(Bendable bendable) {
+      this(bendable, null);
+   }
+
+   @Override
+   public void H() {
+      this.bindLabel.setVisible(!this.w$src$Z$e457mb() && !this.captureTask.isCapturing());
+      if (this.bendable != null) {
+         this.bindLabel.setText(this.bendable.getBindText());
+         double labelHeight = this.bindLabel.getTextHeight();
+         double labelWidth = this.bindLabel.getRenderedWidth();
+         Color effectiveAccentColor = this.accentColor == null ? ColorUtil.getAccentTextColor() : this.accentColor;
+         Color labelColor = this.highlighted ? J.Y : (this.isActive() ? effectiveAccentColor : J.h);
+         this.bindLabel.setTextColor(this.applyAlphaMultiplier(labelColor));
+         float iconSize = 5.0F;
+         float iconOffset = this.A() != 10.0 ? (float)this.A() - 6.0F : iconSize;
+         if (this.captureTask.isCapturing()) {
+            this.setExplicitWidth(10.0);
+            this.o(this.getExplicitWidth());
+            this.w("Click to remove bind");
+         } else {
+            if (this.bindLabel.getText() == null || this.bindLabel.getText().isEmpty()) {
+               this.setExplicitWidth(10.0);
+               this.o(this.getExplicitWidth());
+            }
+
+            String tooltipText = this.buildTooltipText();
+            ToolTips toolTips = this.bindLabel.getToolTips() != null
+               ? new ToolTips(this, tooltipText, 0.7, J.h, false, this.bindLabel.getToolTips().getText(), 0.8, J.Z, true)
+               : new ToolTips(this, tooltipText, 0.7, J.h, false);
+            this.setToolTips(toolTips);
+         }
+
+         if (this.w$src$Z$e457mb() || this.captureTask.isCapturing()) {
+            Color hoverBackgroundColor = new Color(255, 255, 255, this.isActive() ? this.activeAlpha : 17);
+            GuiRenderPrimitives.d(this.G$src$D$1b2f02a(), this.n(), this.A(), this.L(), this.applyAlphaMultiplier(hoverBackgroundColor));
+            ImageRenderer.drawImage(
+               this.applyAlphaMultiplier(this.isActive() ? effectiveAccentColor : J.Z),
+               (float)this.G$src$D$1b2f02a() + iconOffset / 2.0F,
+               (float)this.n() + iconSize / 2.0F - 0.5F,
+               this.captureTask.isCapturing() ? "newclose" : "newedit",
+               iconSize,
+               iconSize,
+               false
+            );
+         } else if (this.bindLabel.getText() != null && !this.bindLabel.getText().isEmpty()) {
+            Color populatedBackgroundColor = this.highlighted ? J.N : new Color(255, 255, 255, this.isActive() ? this.activeAlpha : 17);
+            if (this.bindLabel.getText().length() == 1) {
+               this.setExplicitWidth(10.0);
+            } else {
+               this.getClass();
+               this.setExplicitWidth(labelWidth + 5.0);
+            }
+
+            this.o(this.getExplicitWidth());
+            GuiRenderPrimitives.d(this.G$src$D$1b2f02a(), this.n(), this.A(), this.L(), this.applyAlphaMultiplier(populatedBackgroundColor));
+            if (this.bendable.getActivationMode().equals(BindActivationMode.HELD)) {
+               GuiRenderPrimitives.a(this.G$src$D$1b2f02a() + 2.0, this.n() + this.L() - 1.0, this.A() - 4.0, 1.0F, J.z());
+            }
+
+            this.bindLabel.K(this.G$src$D$1b2f02a() + this.A() / 2.0 - labelWidth / 2.0);
+            this.bindLabel.S(this.n() + this.L() / 2.0 - labelHeight / 2.0 - 0.5);
+         } else {
+            Color emptyBackgroundColor = new Color(255, 255, 255, this.isActive() ? this.activeAlpha : 17);
+            GuiRenderPrimitives.d(
+               this.G$src$D$1b2f02a(), this.n(), this.A(), this.L(), this.applyAlphaMultiplier(this.highlighted ? J.N : emptyBackgroundColor)
+            );
+            Color emptyBindIconColor = this.highlighted ? J.I : (this.isActive() ? effectiveAccentColor : J.h);
+            ImageRenderer.drawImage(
+               this.applyAlphaMultiplier(emptyBindIconColor),
+               (float)this.G$src$D$1b2f02a() + iconOffset / 2.0F,
+               (float)this.n() + iconSize / 2.0F - 0.5F,
+               "newbind",
+               iconSize,
+               iconSize,
+               false
+            );
+         }
+      }
+   }
+
+   public Bendable getBendable() {
+      return this.bendable;
+   }
+
+   public void setActiveOverride(@Nullable Boolean activeOverride) {
+      this.activeOverride = activeOverride;
+   }
+
+   @Override
+   public double x() {
+      return 10.0;
+   }
+
+   private boolean isActive() {
+      if (this.bendable == null) {
+         return false;
+      } else {
+         return this.activeOverride != null ? this.activeOverride : this.bendable.isActive();
+      }
+   }
+
+   public BindableInputComponent(Bendable bendable, Color color) {
+      this.activeAlpha = 51;
+      this.accentColor = color;
+      this.bendable = bendable;
+      this.addClickListener(new BindableInputComponentCaptureToggleClickHandler(this));
+      this.captureTask = new BindableInputComponentSavingBindCaptureTask(this, this.getBendable());
+      this.bindLabel = new TruncatedTextComponent(
+         bendable == null ? "" : bendable.getBindText(), "...", "", 50.0, 0.8, color == null ? ColorUtil.getAccentTextColor() : color, false, false
+      );
+      this.addChildren(this.bindLabel);
+   }
+
+   boolean isShiftPressed() {
+      return KeyboardInput.isKeyDown(160) || KeyboardInput.isKeyDown(161);
+   }
+
+   boolean supportsActivationModeConfiguration() {
+      return this.bendable != null && this.bendable.supportsActivationMode();
+   }
+
+   public void setHighlighted(boolean highlighted) {
+      this.highlighted = highlighted;
+   }
+
+   public void setAccentColor(Color accentColor) {
+      this.accentColor = accentColor;
+   }
+
+   String buildTooltipText() {
+      String tooltipText = "Click to bind\nShift click to modify bind functionality";
+      tooltipText = tooltipText + "\n";
+      if (this.isShiftPressed()) {
+         tooltipText = tooltipText + "§c";
+      }
+
+      return tooltipText + "Bind functionality = " + this.bendable.getActivationMode().getDisplayName();
+   }
+
+   @Override
+   public double C() {
+      return 10.0;
+   }
+
+   public TruncatedTextComponent getBindLabel() {
+      return this.bindLabel;
+   }
+
+   public boolean isCapturing() {
+      return this.captureTask.isCapturing();
+   }
+
+   private Color applyAlphaMultiplier(Color color) {
+      if (color == null) {
+         return null;
+      } else {
+         int adjustedAlpha = Math.max(0, Math.min(255, Math.round(color.getAlpha() * this.alphaMultiplier)));
+         return new Color(color.getRed(), color.getGreen(), color.getBlue(), adjustedAlpha);
+      }
+   }
+
+   public void setActiveAlpha(int activeAlpha) {
+      this.activeAlpha = activeAlpha;
+   }
+}

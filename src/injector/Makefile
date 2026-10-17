@@ -3,11 +3,12 @@ CC     ?= cc
 CFLAGS ?= -std=c11 -Wall -Wextra -pedantic
 JAVAC  ?= javac
 JAR    ?= jar
+PYTHON ?= python3
 
 AGENT_DIR  := java_agent
 AGENT_JAR  := $(AGENT_DIR)/agent.jar
 
-.PHONY: all loader_test shatest agent test clean
+.PHONY: all loader_test shatest agent test single clean
 
 all: loader_test agent
 
@@ -36,6 +37,12 @@ $(AGENT_DIR)/Probe.class: $(AGENT_DIR)/Probe.java
 test: loader_test ../../bundle.dat
 	./loader_test ../../bundle.dat
 
+# Single-file injector: the loader image with the bundle appended, then run
+# with no arguments so it reads its own embedded payload.
+single: loader_test ../../bundle.dat
+	$(PYTHON) embed.py loader_test ../../bundle.dat loader_single
+	./loader_single
+
 clean:
-	rm -f loader_test shatest
+	rm -f loader_test shatest loader_single
 	rm -f $(AGENT_DIR)/*.class $(AGENT_JAR)

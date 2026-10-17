@@ -40,12 +40,17 @@ Infra: Cloudflare front, Express back end (`X-Powered-By: Express`).
 
 ## Retrieval — done, and scripted
 
+> **The payloads below are not committed.** The payload that ships is rebuilt
+> from source in `src/payload` by CI (`mvn package` → `vape_client.jar` →
+> `bundle.dat` → single-file injector). The artifacts here are only the input
+> used to refresh that source. See `docs/BUILD.md`.
+
 The payload needs a valid account token; with one, the whole chain is
 `scripts/update-payload.sh` (or `make update-payload`):
 
 ```sh
 scripts/update-payload.sh --login     # authenticates, then does everything below
-# ≡ auth → fetch → extract → deobfuscate → decompile → swap → bundle → test
+# ≡ auth → fetch → extract → deobfuscate → decompile → install source → rebuild → test
 ```
 
 Latest capture (upstream had moved on since the previous one):
@@ -55,6 +60,12 @@ Latest capture (upstream had moved on since the previous one):
 | `payload.bin` (PE32+ x64) | 25,160,704 | `2d2d4eca01db6d81a4566762b3864b223f87fa3ff82f61e7a6f7fc6fc8fc4528` |
 | `payload_jar/vape_client.jar` (carved) | 25,096,879 | `75411df446b7af9ab963ddb864345c1a8124830fe102812986dcad6198d9b722` |
 | `payload_jar/vape_client_deobf_full.jar` | 25,253,236 | `a6756f968093eb63c62f1482ba508b204d871b2aff1e2b49ea5293b129965ecd` |
+| `src/payload` → rebuilt `vape_client.jar` | 30,166,774 | `2b6c9e9ee501ac8e96b4e65a0fa040958458e9b3c1642f33d87992fdb0854c54` |
+
+The last row is **our** artifact, not Vape's: the client recompiled from
+`src/payload/java` with Maven, ASM/Javassist relocated into
+`gg.vape.shaded.*` and the dependencies shaded in. It is larger than the
+original because it carries full `netty-all`, not the subset Vape had picked.
 
 The JAR manifest identifies this build as **Vape 4.22**
 (`Implementation-Title: Vape 4.22 recovered Java payload`). The previous

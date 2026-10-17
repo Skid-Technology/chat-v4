@@ -1,0 +1,29 @@
+package gg.vape.mapping;
+
+import gg.vape.Vape;
+import gg.vape.event.impl.EventRenderWorldPassExecutorDrain;
+
+public class RenderWorldPassExecutorDrainMappingTask extends JavassistMappingTask {
+   private static final String c;
+
+   void V() {
+      this.c(Vape.INSTANCE.getMappings().RY.J, EventRenderWorldPassExecutorDrain.class, c);
+   }
+
+   public RenderWorldPassExecutorDrainMappingTask() {
+      super(MappedClasses.FW);
+   }
+
+   @Override
+   public void transform() {
+      this.V();
+   }
+
+   static {
+      try {
+         c = "$1";
+      } catch (Exception var1) {
+         throw new ExceptionInInitializerError(var1);
+      }
+   }
+}

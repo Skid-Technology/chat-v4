@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""bundle.py — pack payloads into bundle.dat (see README for format).
+"""bundle.py — pack one or more blobs into a VBDL bundle.
 
-Usage: python3 bundle.py <payload.bin> <vape_client.jar> [out=bundle.dat]
+    bundle.py <file>[:<name>] ... [-o out]
+
+Entry names default to the file's base name. The loader extracts entries
+by name and sha256-verifies each one, so the bundle is self-checking.
+
+Format (little-endian):
+    u32 magic "VBDL" | u32 version | u32 count
+    then per entry: u8 name_len | name | u64 offset | u64 size | 32B sha256
+    then the payload bytes, in the same order.
 """
+import argparse
 import hashlib
+import os
 import struct
-import sys
 
 MAGIC = 0x56424C44  # "VBDL"
 
@@ -36,8 +45,13 @@ def main(files, out="bundle.dat"):
 
 
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    if len(args) < 2:
-        sys.exit("usage: bundle.py <payload.bin> <vape_client.jar> [out]")
-    out = args[2] if len(args) > 2 else "bundle.dat"
-    main([(args[0], "payload.bin"), (args[1], "vape_client.jar")], out)
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("files", nargs="+", metavar="file[:name]",
+                    help="blob to include, optionally with an explicit entry name")
+    ap.add_argument("-o", "--out", default="bundle.dat", help="output path")
+    a = ap.parse_args()
+    entries = []
+    for spec in a.files:
+        path, _, name = spec.partition(":")
+        entries.append((path, name or os.path.basename(path)))
+    main(entries, a.out)

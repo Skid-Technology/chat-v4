@@ -6,6 +6,14 @@
 #include <string.h>
 #include "loader.h"
 
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#else
+#include <unistd.h>
+#endif
+
 static int s_open(uint32_t pid, void **h)
 {
     (void)pid;
@@ -120,38 +128,80 @@ static uint8_t *load_file(const char *path, size_t *n)
     return b;
 }
 
+/* Path of the running image, so the loader can read its own embedded bundle. */
+static int self_path(char *out, size_t cap)
+{
+#if defined(_WIN32)
+    return GetModuleFileNameA(NULL, out, (DWORD)cap) ? 0 : -1;
+#elif defined(__APPLE__)
+    uint32_t sz = (uint32_t)cap;
+    return _NSGetExecutablePath(out, &sz) == 0 ? 0 : -1;
+#else
+    ssize_t r = readlink("/proc/self/exe", out, cap - 1);
+    if (r <= 0)
+        return -1;
+    out[r] = '\0';
+    return 0;
+#endif
+}
+
+static uint8_t *load_self(size_t *n)
+{
+    char path[4096];
+    if (self_path(path, sizeof path))
+        return NULL;
+    return load_file(path, n);
+}
+
 int main(int argc, char **argv)
 {
-    /* usage: loader_test <payload.bin | bundle.dat> */
     uint8_t *filedata = NULL;
     size_t filelen = 0;
+    const uint8_t *blob = NULL;
+    size_t bloblen = 0;
     payload_t p = {0};
     const char *err = NULL;
     int rc;
-    if (argc < 2) {
-        printf("usage: %s <payload.bin|bundle.dat>\n", argv[0]);
-        return 2;
+
+    if (argc >= 2) {
+        /* usage: injector <bundle.dat> */
+        filedata = load_file(argv[1], &filelen);
+        if (!filedata) {
+            printf("cannot read %s\n", argv[1]);
+            return 2;
+        }
+        blob = filedata;
+        bloblen = filelen;
+    } else {
+        /* Single-file injector: read our own image and pick up the bundle
+         * the release pipeline appended (src/injector/embed.py). */
+        filedata = load_self(&filelen);
+        if (!filedata) {
+            printf("usage: %s <bundle.dat>   (this image carries no payload)\n",
+                   argv[0]);
+            return 2;
+        }
+        if (find_embedded_bundle(filedata, filelen, &blob, &bloblen)) {
+            printf("%s: no embedded payload found\n", argv[0]);
+            free(filedata);
+            return 2;
+        }
+        printf("embedded bundle: %zu bytes\n", bloblen);
     }
-    filedata = load_file(argv[1], &filelen);
-    if (!filedata) {
-        printf("cannot read %s\n", argv[1]);
-        return 2;
-    }
-    if (!bundle_extract(filedata, filelen, "payload.bin",
-                          &p.data, &p.len)) {
+
+    if (!bundle_extract(blob, bloblen, PAYLOAD_ENTRY, &p.data, &p.len)) {
         /* bundled path: no login, extracted + sha-verified */
         p.from_bundle = 1;
         printf("bundled payload: %zu bytes, sha ok\n", p.len);
     } else {
-        p.data = filedata;
-        p.len = filelen;
+        p.data = blob;
+        p.len = bloblen;
     }
     rc = run_loader(&OS_STUB, &p, 1234, "C:\\load\\Vape421Native.dll",
                     ZEUS_DEFAULT, 5678, &err);
     printf("validate+run: rc=%d err=%s payload=%zu bytes\n",
            rc, err ? err : "(none)", p.len);
     free(filedata);
-    /* ack is auto-acked by stub; force the reject path once for coverage */
     return rc == 0 ? 0 : 1;
 }
 #endif

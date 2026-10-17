@@ -339,16 +339,26 @@ def cmd_deobf(args) -> Path:
 # ─────────────────────────── decompile ───────────────────────────
 
 def cmd_decompile(args) -> Path:
-    cfr = ROOT / "tools/cfr.jar"
-    if not cfr.is_file():
-        raise SystemExit("tools/cfr.jar missing — run scripts/fetch-tools.sh")
+    """Decompile the JAR.
+
+    Vineflower is the default: its output is what the vendored payload
+    (src/payload/java) is built from, because it compiles where CFR's does
+    not (6 syntax errors vs 114 on the same jar).
+    """
     src = Path(args.jar).resolve()
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
-    print(f"[decompile] cfr {src.name} -> {out}")
-    rc = subprocess.run(["java", "-jar", str(cfr), str(src), "--outputdir", str(out)]).returncode
-    if rc != 0:
-        raise SystemExit("cfr decompilation failed")
+    if args.decompiler == "cfr":
+        tool = ROOT / "tools/cfr.jar"
+        argv = ["java", "-jar", str(tool), str(src), "--outputdir", str(out)]
+    else:
+        tool = ROOT / "tools/vineflower.jar"
+        argv = ["java", "-jar", str(tool), "-dgs=1", str(src), str(out)]
+    if not tool.is_file():
+        raise SystemExit(f"{tool.name} missing — run scripts/fetch-tools.sh")
+    print(f"[decompile] {args.decompiler} {src.name} -> {out}")
+    if subprocess.run(argv).returncode != 0:
+        raise SystemExit(f"{args.decompiler} decompilation failed")
     n = sum(1 for _ in out.rglob("*.java"))
     print(f"[decompile] wrote {n} .java files to {out}")
     return out
@@ -414,9 +424,10 @@ def build_parser() -> argparse.ArgumentParser:
     d.add_argument("--report", default="payload_jar/deobf_report_full.tsv")
     d.set_defaults(func=cmd_deobf)
 
-    c = sub.add_parser("decompile", help="decompile the JAR with CFR")
+    c = sub.add_parser("decompile", help="decompile the JAR (Vineflower by default)")
     c.add_argument("jar", nargs="?", default="payload_jar/vape_client_deobf_full.jar")
-    c.add_argument("-o", "--out", default="src/decompiled")
+    c.add_argument("-o", "--out", default=".decompiled")
+    c.add_argument("--decompiler", choices=["vineflower", "cfr"], default="vineflower")
     c.set_defaults(func=cmd_decompile)
 
     a = sub.add_parser("all", help="login -> fetch -> extract -> deobf -> decompile")

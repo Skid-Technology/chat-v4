@@ -46,6 +46,18 @@ _Static_assert(sizeof(bootstrap_t) == BOOTSTRAP_SIZE, "0x1A8");
 #define BUNDLE_MAGIC 0x56424C44u /* "VBDL" */
 #define BUNDLE_VER   1u
 
+/* --- single-file injector -------------------------------------------------
+ * The released injector is one file: the loader image, the bundle appended,
+ * and a 24-byte trailer. The loader reads its own image, so it needs no
+ * external payload. See find_embedded_bundle(). */
+#define EMBED_MAGIC        "VAPEEMB" /* 8 bytes: 'V','A','P','E','E','M','B','\0' */
+#define EMBED_TRAILER_SIZE 24u       /* magic(8) + u64 offset + u64 size       */
+
+/* The bundle entry the loader consumes. The original payload was a native
+ * 64-bit PE; this reconstruction ships the Java client, rebuilt from
+ * src/payload, so the entry is a JAR (and validation accepts either). */
+#define PAYLOAD_ENTRY "vape_client.jar"
+
 /* --- pipeline stages --- */
 typedef enum {
     STAGE_AUTH = 0,
@@ -88,6 +100,13 @@ typedef struct {
 
 /* Pipeline entry points (loader.c). */
 int stage_validate_pe(const uint8_t *data, size_t len, const char **err);
+int stage_validate_jar(const uint8_t *data, size_t len, const char **err);
+/* Accepts either payload shape: the original native PE, or the reconstructed
+ * Java client (a JAR). Used by run_loader. */
+int stage_validate_payload(const uint8_t *data, size_t len, const char **err);
+/* Locate a bundle appended to `self` (the single-file injector layout). */
+int find_embedded_bundle(const uint8_t *self, size_t n,
+                         const uint8_t **blob, size_t *len);
 int stage_build_bootstrap(bootstrap_t *b, uint32_t pid, const char *dll_path,
                           const char *zeus_host, uint16_t ctrl_port);
 int bundle_extract(const uint8_t *blob, size_t blen, const char *name,

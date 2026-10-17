@@ -38,8 +38,9 @@ python3 src/cli/vape_loader.py extract payload.bin -o payload_jar/vape_client.ja
 # 4. deobfuscate it (needs Gradle; drives ../zkm-flowdeobf)
 python3 src/cli/vape_loader.py deobf payload_jar/vape_client.jar
 
-# 5. decompile it (needs tools/cfr.jar; run scripts/fetch-tools.sh)
-python3 src/cli/vape_loader.py decompile payload_jar/vape_client_deobf_full.jar -o src/decompiled
+# 5. decompile it (needs tools/vineflower.jar; run scripts/fetch-tools.sh)
+python3 src/cli/vape_loader.py decompile payload_jar/vape_client_deobf_full.jar -o .decompiled
+#    → install only Vape's packages as the payload source: scripts/install-payload-src.py
 
 # …or all of it in one go
 python3 src/cli/vape_loader.py all --browser
