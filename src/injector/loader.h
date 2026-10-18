@@ -54,7 +54,13 @@ typedef struct {
 } bootstrap_t;
 #pragma pack(pop)
 
-_Static_assert(sizeof(bootstrap_t) == BOOTSTRAP_SIZE, "bootstrap block is 0x1A8");
+/* The block layout is load-bearing: the target reads it by offset. */
+#if defined(__cplusplus)
+#define LOADER_ASSERT(cond, msg) static_assert(cond, msg)
+#else
+#define LOADER_ASSERT(cond, msg) _Static_assert(cond, msg)
+#endif
+LOADER_ASSERT(sizeof(bootstrap_t) == BOOTSTRAP_SIZE, "bootstrap block is 0x1A8");
 
 /* --- bundle format --- */
 #define BUNDLE_MAGIC 0x56424C44u /* "VBDL" */

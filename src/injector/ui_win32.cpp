@@ -551,8 +551,7 @@ static bool create_device(HWND hwnd)
 static void load_fonts(void)
 {
     char win[MAX_PATH], path[MAX_PATH];
-    ImFontConfig cfg;
-    memset(&cfg, 0, sizeof cfg);
+    ImFontConfig cfg = ImFontConfig();
     cfg.OversampleH = 2;
     cfg.OversampleV = 2;
     GetWindowsDirectoryA(win, MAX_PATH);
