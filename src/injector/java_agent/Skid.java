@@ -6,7 +6,9 @@
  * brand name and the Discord invite, then asks whether to show it again. The
  * answer is kept in the JVM's temp directory.
  *
- * The Windows injector paints the same splash natively (src/injector/ui_win32.c).
+ * This is the macOS/Linux half. On Windows the injector is the native Loader
+ * UI (src/injector/ui_win32.cpp); the client it hosts prints its own splash
+ * when the Java client starts.
  * No dependencies; plain Swing, Java 8.
  */
 

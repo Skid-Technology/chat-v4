@@ -148,71 +148,62 @@ int find_embedded_bundle(const uint8_t *self, size_t n,
     return 0;
 }
 
-int stage_build_bootstrap(bootstrap_t *b, uint32_t pid, const char *dll_path,
-                          const char *zeus_host, uint16_t ctrl_port)
+int stage_build_bootstrap(bootstrap_t *b, uint32_t pid, const char *url,
+                          const char *zeus_host, uint16_t zeus_port)
 {
-    size_t hlen = strlen(zeus_host);
-    size_t dlen = strlen(dll_path) + 1;
-    if (hlen > 0x7F)
+    size_t ulen = strlen(url) + 1;
+    size_t hlen = strlen(zeus_host) + 1;
+    if (ulen > sizeof(b->url) || hlen > sizeof(b->zeus_host))
         return -1; /* "VAPE_ONLINE_BASE_URL is too long for the bootstrap" */
     memset(b, 0, sizeof(*b));
     b->magic = BOOTSTRAP_MAGIC;
     b->ver_size = BOOTSTRAP_VER;
     b->pid = pid;
     b->one = 1;
-    b->loader_port = ctrl_port;
-    if (dlen > sizeof(b->dll_path))
-        dlen = sizeof(b->dll_path);
-    memcpy(b->dll_path, dll_path, dlen);
-    memcpy(b->zeus_host, zeus_host, hlen + 1);
-    b->ctrl_port = ctrl_port;
+    b->loader_port = zeus_port;
+    memcpy(b->url, url, ulen);
+    memcpy(b->zeus_host, zeus_host, hlen);
+    b->zeus_port = zeus_port;
     b->status = STATUS_POSTED;
     return 0;
 }
 
 /*
- * Full run. Decompile-faithful order:
- *  validate -> bootstrap_create -> open_process -> write image (path A/B
- *  chosen by backend via inject_image) -> wait thread 30 s ->
- *  wait ack 30 s, require status == 2 -> cleanup (zero block, free, close).
- * The backend's inject_image implements path A (reflective, entry RVA) or
- * path B (manual map + LoadLibraryA stub); loader.c only orchestrates.
+ * Full run. Order copied from the Loader:
+ *  validate -> bootstrap_create -> write block -> inject (open process, place
+ *  and start the payload) -> wait thread 30 s -> wait ack 30 s, require
+ *  status == 2 -> teardown (zero block, release remote, close handles).
+ * The backend's inject()/detach() own the process handle and the remote
+ * allocation; loader.c only orchestrates and applies the error strings.
  */
 int run_loader(const os_api_t *os, const payload_t *payload, uint32_t pid,
-               const char *dll_path, const char *zeus_host, uint16_t ctrl_port,
-               const char **err)
+               const char *dll_path, const char *url, const char *zeus_host,
+               uint16_t zeus_port, const char **err)
 {
     bootstrap_t local;
     bootstrap_t *view = NULL;
-    void *mapping = NULL, *ack = NULL, *proc = NULL, *thread = NULL;
+    void *mapping = NULL, *ack = NULL;
     uint32_t code = 0;
     int rc = -1;
 
     if (stage_validate_payload(payload->data, payload->len, err))
         return -1;
-    if (stage_build_bootstrap(&local, pid, dll_path, zeus_host, ctrl_port)) {
+    if (stage_build_bootstrap(&local, pid, url, zeus_host, zeus_port)) {
         *err = "VAPE_ONLINE_BASE_URL is too long for the bootstrap";
         return -1;
     }
-    if (os->bootstrap_create(pid, &view, &mapping, &ack)) {
-        *err = "Failed to create the Loader bootstrap objects";
+    if (os->bootstrap_create(pid, &view, &mapping, &ack, err)) {
+        if (!*err)
+            *err = "Failed to create the Loader bootstrap objects";
         return -1;
     }
     memcpy(view, &local, sizeof(local));
-    if (os->open_process(pid, &proc)) {
-        *err = "Failed to open Minecraft process";
+
+    if (os->inject(payload, pid, dll_path, err))
         goto out;
-    }
-    /* image write + thread start: backend-specific (path A or B) */
-    if (os->start_thread(proc, NULL, NULL, &thread) || !thread) {
-        *err = "Failed to start Product DLL loading";
+    if (os->wait_inject(INJECT_TIMEOUT_MS, &code) || code == 0) {
+        *err = "Product DLL loading timed out";
         goto out;
-    }
-    {
-        if (os->wait_thread(thread, ACK_TIMEOUT_MS, &code) || code == 0) {
-            *err = "Product DLL loading timed out";
-            goto out;
-        }
     }
     if (os->wait_ack(ack, ACK_TIMEOUT_MS)) {
         *err = "Product DLL did not acknowledge the socket bootstrap";
@@ -225,11 +216,8 @@ int run_loader(const os_api_t *os, const payload_t *payload, uint32_t pid,
     rc = 0;
     *err = NULL;
 out:
-    if (view)
-        memset(view, 0, sizeof(*view));
-    if (proc)
-        os->close_handle(proc);
-    if (view)
-        os->bootstrap_destroy(view, mapping, ack);
+    os->detach();
+    memset(view, 0, sizeof(*view));
+    os->bootstrap_destroy(view, mapping, ack);
     return rc;
 }

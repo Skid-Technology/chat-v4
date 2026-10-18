@@ -4,8 +4,9 @@ name: release
 # nothing is downloaded and no payload binary is committed or published:
 #
 #   src/payload (Java source)              -> vape_client.jar   (Maven + shade)
-#   vape_client.jar                        -> bundle.dat        (bundle.py)
-#   src/injector/ui_win32.c + injection    -> injector.exe      (mingw + embed.py)
+#   src/injector/host_dll.c                -> Vape421Native.dll (mingw)
+#   host DLL + vape_client.jar             -> bundle.dat        (bundle.py)
+#   src/injector ui_win32.cpp + os_win32.c -> injector.exe      (mingw + embed.py)
 #   src/injector/java_agent (Java source)  -> agent.jar         (for macOS/Linux)
 #
 # Assets: injector.exe (Windows, native UI, payload inside it) + agent.jar.
@@ -62,21 +63,23 @@ jobs:
           name: payload
           path: payload
 
-      - name: Install the mingw-w64 cross compiler
+      - name: Install the mingw-w64 cross compilers
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64
+          sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
 
-      - name: Bundle the payload
-        run: python3 src/injector/bundle.py payload/vape_client.jar -o bundle.dat
-
-      - name: Verify the injection logic (same sources, native build)
-        run: make test
+      - name: Stage the payload artifact as the build product
+        run: |
+          mkdir -p src/payload/target
+          cp payload/vape_client.jar src/payload/target/vape_client.jar
 
       - name: Build injector.exe (native ui + injection logic + payload)
         run: |
           make windows
           make verify
+
+      - name: Walk the pipeline against the portable backend
+        run: make test
 
       - uses: actions/upload-artifact@v4
         with:

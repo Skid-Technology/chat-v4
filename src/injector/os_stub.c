@@ -1,6 +1,8 @@
 /* os_stub.c — stub backend: runs the portable pipeline anywhere.
  * Simulates a target process with malloc'd memory so validate/build/run
- * exercise real logic. mmap/heap stands in for the remote process. */
+ * exercise real logic. Heap stands in for the remote process, and the ack is
+ * produced locally, so the full order in run_loader() is walked without a
+ * Windows target. The real backend is os_win32.c. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,81 +16,65 @@
 #include <unistd.h>
 #endif
 
-static int s_open(uint32_t pid, void **h)
-{
-    (void)pid;
-    *h = malloc(1 << 20); /* fake remote address space */
-    return *h ? 0 : -1;
-}
-static int s_alloc(void *p, size_t n, void **a)
-{
-    (void)p;
-    *a = malloc(n);
-    return *a ? 0 : -1;
-}
-static int s_write(void *p, void *a, const void *b, size_t n)
-{
-    (void)p;
-    memcpy(a, b, n);
-    return 0;
-}
-static int s_read(void *p, const void *a, void *b, size_t n)
-{
-    (void)p;
-    memcpy(b, a, n);
-    return 0;
-}
-static int s_thread(void *p, void *e, void *q, void **t)
-{
-    (void)p;
-    (void)e;
-    (void)q;
-    *t = malloc(1);
-    return *t ? 0 : -1;
-}
-static int s_wait(void *t, uint32_t ms, uint32_t *code)
-{
-    (void)ms;
-    free(t);
-    *code = 1; /* stub loader "succeeds" */
-    return 0;
-}
-static int s_free(void *p, void *a)
-{
-    (void)p;
-    free(a);
-    return 0;
-}
-static int s_close(void *h)
-{
-    free(h);
-    return 0;
-}
 static bootstrap_t *s_view = NULL;
-static int s_bcreate(uint32_t pid, bootstrap_t **v, void **m, void **e)
+static void *s_remote = NULL;
+
+static int s_bcreate(uint32_t pid, bootstrap_t **v, void **m, void **e,
+                     const char **err)
 {
     (void)pid;
     *v = calloc(1, sizeof(bootstrap_t));
     *m = *v;
     *e = malloc(1);
     s_view = *v;
+    *err = NULL;
     return (*v && *e) ? 0 : -1;
 }
-static int s_bdestroy(bootstrap_t *v, void *m, void *e)
+static void s_bdestroy(bootstrap_t *v, void *m, void *e)
 {
     (void)m;
     free(v);
     free(e);
-    return 0;
+    s_view = NULL;
 }
 static int s_ack(void *e, uint32_t ms)
 {
     (void)e;
     (void)ms;
-    /* simulate the Product DLL acknowledging the bootstrap */
+    /* simulate the product acknowledging the bootstrap */
     if (s_view)
         s_view->status = STATUS_ACKED;
     return 0;
+}
+static int s_inject(const payload_t *p, uint32_t pid, const char *dll_path,
+                    const char **err)
+{
+    (void)pid;
+    if (!p || !p->data || !p->len) {
+        *err = "Payload image is empty";
+        return -1;
+    }
+    /* stand in for NtAllocateVirtualMemory + NtWriteVirtualMemory */
+    s_remote = malloc(p->len ? p->len : 1);
+    if (!s_remote) {
+        *err = "Failed to allocate memory in target process for payload";
+        return -1;
+    }
+    memcpy(s_remote, p->data, p->len);
+    printf("[stub] placed %zu bytes%s%s\n", p->len,
+           dll_path ? ", path " : "", dll_path ? dll_path : "");
+    return 0;
+}
+static int s_wait(uint32_t ms, uint32_t *code)
+{
+    (void)ms;
+    *code = 1; /* stub loader "succeeds" */
+    return 0;
+}
+static void s_detach(void)
+{
+    free(s_remote);
+    s_remote = NULL;
 }
 static int s_post(const char *u, const char *b, uint8_t **o, size_t *n)
 {
@@ -105,8 +91,7 @@ static int s_browser(const char *u)
 }
 
 const os_api_t OS_STUB = {
-    s_open, s_alloc, s_write, s_read, s_thread, s_wait, s_free, s_close,
-    s_bcreate, s_bdestroy, s_ack, s_post, s_browser
+    s_bcreate, s_bdestroy, s_ack, s_inject, s_wait, s_detach, s_post, s_browser
 };
 
 #ifdef LOADER_TEST_MAIN
@@ -160,6 +145,8 @@ int main(int argc, char **argv)
     const uint8_t *blob = NULL;
     size_t bloblen = 0;
     payload_t p = {0};
+    const uint8_t *host = NULL;
+    size_t hostlen = 0;
     const char *err = NULL;
     int rc;
 
@@ -189,18 +176,19 @@ int main(int argc, char **argv)
         printf("embedded bundle: %zu bytes\n", bloblen);
     }
 
-    if (!bundle_extract(blob, bloblen, PAYLOAD_ENTRY, &p.data, &p.len)) {
-        /* bundled path: no login, extracted + sha-verified */
-        p.from_bundle = 1;
-        printf("bundled payload: %zu bytes, sha ok\n", p.len);
-    } else {
+    if (bundle_extract(blob, bloblen, HOST_DLL_ENTRY, &host, &hostlen) == 0)
+        printf("host    : %zu bytes\n", hostlen);
+    if (bundle_extract(blob, bloblen, PAYLOAD_ENTRY, &p.data, &p.len)) {
+        /* no VBDL index (raw blob): treat it as the payload itself */
         p.data = blob;
         p.len = bloblen;
     }
-    rc = run_loader(&OS_STUB, &p, 1234, "C:\\load\\Vape421Native.dll",
-                    ZEUS_DEFAULT, 5678, &err);
-    printf("validate+run: rc=%d err=%s payload=%zu bytes\n",
-           rc, err ? err : "(none)", p.len);
+    p.from_bundle = 1;
+    printf("payload : %zu bytes\n", p.len);
+
+    rc = run_loader(&OS_STUB, &p, 1234, host ? "Vape421Native.dll" : NULL,
+                    LOADER_BASE_URL, ZEUS_DEFAULT, 8091, &err);
+    printf("validate+run: rc=%d err=%s\n", rc, err ? err : "(none)");
     free(filedata);
     return rc == 0 ? 0 : 1;
 }
